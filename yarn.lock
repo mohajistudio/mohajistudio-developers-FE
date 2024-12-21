@@ -7141,6 +7141,7 @@ __metadata:
     react: ^18
     react-dom: ^18
     storybook: ^8.4.7
+    tailwind-merge: ^2.5.5
     tailwindcss: ^3.3.0
     typescript: ^5
   languageName: unknown
@@ -9224,6 +9225,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 53b1e247e68e05db7b3808b99b892bd36fb096e6fba213a06da7fab22045e97597db425c724f2bbd6c99a3c295e1e73f3e4de78592289f38431049e1277ca0ae
+  languageName: node
+  linkType: hard
+
+"tailwind-merge@npm:^2.5.5":
+  version: 2.5.5
+  resolution: "tailwind-merge@npm:2.5.5"
+  checksum: c835c763642988aa7185f242f93a61a6ce45d577edbefa4016727e664d9e130fa153b0d3a8bbcfcefd1de6a204e9d302971826d4d1068b6fd92ef66a27f35351
   languageName: node
   linkType: hard
 

@@ -38,3 +38,50 @@ export const verifyEmailCode = async (email: string, code: string) => {
     throw error;
   }
 };
+
+// 비밀번호 설정
+export const setPassword = async (password: string, accessToken: string) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('인증 토큰이 없습니다.');
+  try {
+    const response = await instance.post<void>(
+      '/auth/register/password',
+      { password },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data) {
+      throw error.response.data as ApiError;
+    }
+    throw error;
+  }
+};
+
+// 닉네임 설정
+export const setNickname = async (nickname: string) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) throw new Error('인증 토큰이 없습니다.');
+
+  try {
+    const response = await instance.post<void>(
+      '/auth/register/nickname',
+      { nickname },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data) {
+      throw error.response.data as ApiError;
+    }
+    throw error;
+  }
+};

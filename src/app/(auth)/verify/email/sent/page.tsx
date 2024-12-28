@@ -9,7 +9,7 @@ export default function EmailSentPage() {
   const email = searchParams.get('email') || localStorage.getItem('tempEmail');
 
   const handleConfirm = () => {
-    router.push('/verify/email');
+    router.push(`/verify/email?email=${encodeURIComponent(email || '')}`);
   };
 
   return (

@@ -17,7 +17,19 @@ export const getAuthErrorMessage = (error: ApiError): string => {
     case AUTH_ERROR_CODES.VERIFICATION_ATTEMPT_EXCEEDED:
       return '인증 시도 횟수를 초과했습니다.';
 
+    case AUTH_ERROR_CODES.UNKNOWN_USER:
+      return '등록되지 않은 사용자입니다.';
+
+    case AUTH_ERROR_CODES.PASSWORD_ALREADY_SET:
+      return '이미 비밀번호가 설정되어 있습니다.';
+
+    case AUTH_ERROR_CODES.UNKNOWN_USER:
+      return '등록되지 않은 사용자입니다.';
+
+    case AUTH_ERROR_CODES.NICKNAME_ALREADY_SET:
+      return '이미 닉네임이 설정되어 있습니다.';
+
     default:
-      return '알 수 없는 에러가 발생했습니다.';
+      return error.message;
   }
 };

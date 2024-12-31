@@ -3,69 +3,53 @@
 import { ChevronLeft } from 'lucide-react';
 import { PasswordInput } from '@/components/ui/Input/PasswordInput';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { getAuthErrorMessage } from '@/utils/handle-error';
+import { ApiError } from '@/types/auth';
+import { setPassword } from '@/apis/auth/register';
 
 export default function SetPasswordPage() {
   const router = useRouter();
-  const [password, setPassword] = useState('');
+  const [password, setPasswordValue] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState({
-    password: '',
-    confirm: '',
-  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  // 토큰 체크
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      router.push('/signup');
+    }
+  }, [router]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
-    //TODO: 비밀번호 검증로직 구현
-
-    // 비밀번호 형식 검사 (영문, 숫자, 특수문자)
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      setErrors((prev) => ({
-        ...prev,
-        password: '사용하실 수 없는 비밀번호입니다.',
-      }));
-      return;
-    }
-
-    // 비밀번호 확인 입력 여부 검사
-    if (!confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirm: '비밀번호가 입력되지 않습니다.',
-      }));
-      return;
-    }
-
-    // 비밀번호 일치 여부 검사
     if (password !== confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirm: '비밀번호가 일치하지 않습니다.',
-      }));
+      setError('비밀번호가 일치하지 않습니다.');
+      setIsLoading(false);
       return;
     }
 
-    // 모든 검증 통과시
-    localStorage.setItem('userPassword', password);
-    router.push('/signup/profile');
-  };
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) throw new Error('인증 토큰이 없습니다.');
 
-  // 입력값 변경 시 해당 필드의 에러 메시지만 초기화
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: 'password' | 'confirm',
-  ) => {
-    const { value } = e.target;
-    if (type === 'password') {
-      setPassword(value);
-      setErrors((prev) => ({ ...prev, password: '' }));
-    } else {
-      setConfirmPassword(value);
-      setErrors((prev) => ({ ...prev, confirm: '' }));
+      await setPassword(password, accessToken);
+
+      // 회원가입 완료 후 로그인 페이지로 이동
+      router.push('/login');
+    } catch (error) {
+      if ('code' in (error as any)) {
+        setError(getAuthErrorMessage(error as ApiError));
+      } else {
+        setError('비밀번호 설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,43 +76,37 @@ export default function SetPasswordPage() {
             <div>
               <div className="flex justify-between items-center mb-3">
                 <label className="text-[16px] text-black">비밀번호</label>
-                {errors.password && (
-                  <p className="text-[14px] text-[#FF3D5E]">
-                    {errors.password}
-                  </p>
-                )}
+                {error && <p className="text-[14px] text-[#FF3D5E]">{error}</p>}
               </div>
               <PasswordInput
                 value={password}
-                onChange={(e) => handleChange(e, 'password')}
+                onChange={(e) => setPasswordValue(e.target.value)}
                 placeholder="비밀번호를 입력하세요"
                 required
-                className={`w-full ${errors.password ? 'border-[#FF3D5E] border' : ''}`}
+                disabled={isLoading}
               />
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-[16px] text-black">비밀번호 확인</label>
-                {errors.confirm && (
-                  <p className="text-[14px] text-[#FF3D5E]">{errors.confirm}</p>
-                )}
-              </div>
+              <label className="block text-[16px] text-black mb-3">
+                비밀번호 확인
+              </label>
               <PasswordInput
                 value={confirmPassword}
-                onChange={(e) => handleChange(e, 'confirm')}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="비밀번호를 다시 입력하세요"
                 required
-                className={`w-full ${errors.confirm ? 'border-[#FF3D5E] border' : ''}`}
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mt-[60px]"
+            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mt-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            다음
+            {isLoading ? '처리중...' : '확인'}
           </button>
         </form>
       </div>

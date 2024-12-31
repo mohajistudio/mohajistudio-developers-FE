@@ -29,6 +29,9 @@ export default function EmailVerificationPage() {
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
 
+      // 이메일 저장
+      localStorage.setItem('tempEmail', email);
+
       // 비밀번호 설정 페이지로 이동
       router.push('/signup/password');
     } catch (error) {

@@ -4,6 +4,7 @@ import {
   type EmailVerificationRequest,
   type ApiError,
   EmailVerificationResponse,
+  type SetNickNameRequest,
 } from '@/types/auth';
 
 //   이메일 인증 코드 발급
@@ -68,6 +69,11 @@ export const setNickname = async (nickname: string) => {
   if (!token) throw new Error('인증 토큰이 없습니다.');
 
   try {
+    // console.log('[닉네임 설정 요청]', {
+    //   nickname,
+    //   token: `Bearer ${token}`,
+    // });
+
     const response = await instance.post<void>(
       '/auth/register/nickname',
       { nickname },
@@ -77,10 +83,19 @@ export const setNickname = async (nickname: string) => {
         },
       },
     );
+
+    // console.log('[닉네임 설정 성공]', response.data);
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.data) {
-      throw error.response.data as ApiError;
+    if (axios.isAxiosError(error)) {
+      console.error('[닉네임 설정 실패]', {
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      if (error.response?.data) {
+        throw error.response.data as ApiError;
+      }
     }
     throw error;
   }

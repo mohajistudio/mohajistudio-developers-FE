@@ -7,27 +7,28 @@ import { FormEvent, useState, useEffect } from 'react';
 import { DisabledInput } from '@/components/ui/Input/DisabledInput';
 import { getAuthErrorMessage } from '@/utils/handle-error';
 import type { ApiError } from '@/types/auth';
+import { AUTH_ERROR_CODES } from '@/types/auth';
+import { setNickname } from '@/apis/auth/register';
 
-export default function SetProfilePage() {
+export default function SetNickNamePage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNicknameValue] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
 
-  // TODO: 백엔드 연결 시 useEffect로 수정예정
-  // 컴포넌트 마운트 시 이메일과 토큰 체크
+  // 초기 로딩 시 토큰과 이메일 체크
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    const savedEmail = localStorage.getItem('tempEmail');
+    const storedEmail = localStorage.getItem('tempEmail');
 
     if (!accessToken) {
       router.push('/signup');
       return;
     }
 
-    if (savedEmail) {
-      setEmail(savedEmail);
+    if (storedEmail) {
+      setEmail(storedEmail);
     }
   }, [router]);
 
@@ -36,19 +37,32 @@ export default function SetProfilePage() {
     setError('');
     setIsLoading(true);
 
-    try {
-      const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) {
-        router.push('/signup');
-        return;
-      }
+    // accessToken 확인
+    const token = localStorage.getItem('accessToken');
+    console.log('[닉네임 설정 시작]', {
+      nickname,
+      hasToken: !!token,
+    });
 
+    try {
       await setNickname(nickname);
-      // 회원가입 완료 후 로그인 페이지로 이동
+      // console.log('[닉네임 설정 완료]');
+
+      // 회원가입 완료 후 필요없는 임시 데이터 삭제
+      localStorage.removeItem('tempEmail');
+
+      // 홈 페이지로 이동
       router.push('/login');
     } catch (error) {
+      // console.error('[닉네임 설정 에러]', error);
+
       if ('code' in (error as any)) {
-        setError(getAuthErrorMessage(error as ApiError));
+        const apiError = error as ApiError;
+        // console.error('[API 에러]', {
+        //   code: apiError.code,
+        //   message: apiError.message,
+        // });
+        setError(getAuthErrorMessage(apiError));
       } else {
         setError('닉네임 설정에 실패했습니다. 잠시 후 다시 시도해주세요.');
       }
@@ -93,7 +107,10 @@ export default function SetProfilePage() {
                 type="text"
                 placeholder="Mohaji_Developer"
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
+                onChange={(e) => {
+                  console.log('[입력] 닉네임 변경:', e.target.value);
+                  setNicknameValue(e.target.value);
+                }}
                 required
                 disabled={isLoading}
                 className={error ? 'border-[#FF3D5E]' : ''}

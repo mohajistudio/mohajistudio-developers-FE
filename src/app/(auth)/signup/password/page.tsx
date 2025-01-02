@@ -40,8 +40,7 @@ export default function SetPasswordPage() {
 
       await setPassword(password, accessToken);
 
-      // 회원가입 완료 후 로그인 페이지로 이동
-      router.push('/login');
+      router.push('/signup/nickname');
     } catch (error) {
       if ('code' in (error as any)) {
         setError(getAuthErrorMessage(error as ApiError));

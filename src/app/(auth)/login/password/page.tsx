@@ -2,28 +2,59 @@
 
 import { ChevronLeft } from 'lucide-react';
 import { PasswordInput } from '@/components/ui/Input/PasswordInput';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { DisabledInput } from '@/components/ui/Input/DisabledInput';
+import { useRouter } from 'next/navigation';
+import { FormEvent, useState, useEffect } from 'react';
+import { login } from '@/apis/auth/login';
+import { getAuthErrorMessage } from '@/utils/handle-error';
+import type { ApiError } from '@/types/auth';
 
 export default function LoginPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('tempEmail');
+    if (!storedEmail) {
+      router.push('/login');
+      return;
+    }
+    setEmail(storedEmail);
+  }, [router]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: 로그인 로직 구현
-    if (password) {
-      localStorage.setItem('isLoggedIn', 'true');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await login({ email, password });
+
+      // 토큰 저장
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+
+      // 임시 데이터 삭제
+      localStorage.removeItem('tempEmail');
+
+      // 홈으로 이동
       router.push('/');
+    } catch (error) {
+      if ('code' in (error as any)) {
+        setError(getAuthErrorMessage(error as ApiError));
+      } else {
+        setError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="relative w-full">
-      {/* 백버튼을 absolute로 좌측 상단에 배치 */}
       <button
         onClick={() => router.back()}
         className="absolute -top-12 -left-12"
@@ -33,43 +64,59 @@ export default function LoginPasswordPage() {
       </button>
 
       <div className="w-full max-w-[360px] mx-auto">
-        {/* 헤더 영역 */}
         <div className="space-y-[20px] mb-[60px]">
           <h1 className="text-[30px] font-bold text-left">Mohaji Developers</h1>
           <p className="text-[16px] text-[#666666] text-left">
-            비밀번호를 입력하세요
+            비밀번호로 입력
           </p>
         </div>
 
-        {/* 폼 영역 */}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[16px] text-[#666666] mb-3">
+              email
+            </label>
+            <DisabledInput value={email} />
+          </div>
+
+          <div>
             <label className="block text-[16px] text-black mb-3">
               password
             </label>
             <PasswordInput
-              placeholder="비밀번호를 입력하세요"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={isLoading}
+              className={error ? 'border-[#FF3D5E]' : ''}
+              autoComplete="new-password"
             />
           </div>
 
+          {error && <p className="text-[14px] text-[#FF3D5E] pt-2">{error}</p>}
+
           <button
             type="submit"
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mb-[60px]"
+            className={`w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed ${
+              error ? 'mt-3' : 'mt-5'
+            }`}
+            disabled={isLoading}
           >
-            로그인
+            {isLoading ? '처리중...' : '로그인'}
           </button>
-
-          {/* 회원가입 링크 */}
-          <div className="text-center text-[16px]">
-            <span className="text-[#666666]">비밀번호를 잊으셨나요? </span>
-            <Link href="/password/reset" className="text-[#1E96FF]">
-              비밀번호 찾기
-            </Link>
-          </div>
         </form>
+
+        <div className="mt-5 text-center">
+          <button
+            onClick={() => {
+              // TODO: 비밀번호 찾기 페이지로 이동
+              alert('준비 중인 기능입니다.');
+            }}
+            className="text-[#1E96FF] text-[14px] hover:underline"
+          >
+            비밀번호를 잃으셨나요?
+          </button>
+        </div>
       </div>
     </div>
   );

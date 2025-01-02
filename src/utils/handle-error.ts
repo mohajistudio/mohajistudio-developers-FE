@@ -29,6 +29,24 @@ export const getAuthErrorMessage = (error: ApiError): string => {
     case AUTH_ERROR_CODES.NICKNAME_ALREADY_SET:
       return '이미 닉네임이 설정되어 있습니다.';
 
+    case AUTH_ERROR_CODES.PASSWORD_NOT_SET:
+      return '비밀번호 설정이 필요합니다.';
+
+    case AUTH_ERROR_CODES.NICKNAME_NOT_SET:
+      return '닉네임 설정이 필요합니다.';
+
+    case AUTH_ERROR_CODES.INVALID_TOKEN:
+      return '유효하지 않은 토큰입니다.';
+
+    case AUTH_ERROR_CODES.MISSING_PARAMETER:
+      return '필수 정보가 누락되었습니다.';
+
+    case AUTH_ERROR_CODES.PASSWORD_NOT_SET:
+      return '설정되지 않은 비밀번호입니다.';
+
+    case AUTH_ERROR_CODES.NICKNAME_NOT_SET:
+      return '설정되지 않은 닉네임입니다.';
+
     default:
       return error.message;
   }

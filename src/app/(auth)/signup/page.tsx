@@ -55,26 +55,27 @@ export default function SignUpPage() {
         </div>
 
         {/* 폼 영역 */}
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center mb-3">
-              <label className="text-[16px] text-black">email</label>
-              {error && <p className="text-[14px] text-[#FF3D5E]">{error}</p>}
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[16px] text-black mb-3">email</label>
             <Input
               type="email"
               placeholder="Mohaji@naver.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
               required
-              className={`w-full ${error ? 'border-[#FF3D5E] border' : ''}`}
+              disabled={isLoading}
+              className={error ? 'border-[#FF3D5E]' : ''}
             />
           </div>
 
+          {error && <p className="text-[14px] text-[#FF3D5E] pt-2">{error}</p>}
+
           <button
             type="submit"
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mt-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed ${
+              error ? 'mt-3' : 'mt-5'
+            }`}
             disabled={isLoading}
           >
             {isLoading ? '처리중...' : '다음'}

@@ -22,10 +22,10 @@ export default function EmailSentPage() {
         <ChevronLeft className="h-6 w-6 text-[#666666] hover:text-[#4D4D4D]" />
       </button>
 
-      <div className="w-full max-w-[360px] mx-auto">
+      <div className="w-full max-w-[360px] mx-auto text-center">
         <div className="space-y-[20px] mb-[60px]">
-          <h1 className="text-[30px] font-bold text-left">메일 인증</h1>
-          <div className="space-y-2 text-left">
+          <h1 className="text-[30px] font-bold">메일 인증</h1>
+          <div className="space-y-2">
             <div className="space-y-1 text-[16px] text-[#666666]">
               <p>
                 <span className="font-bold">{email}</span>으로
@@ -38,14 +38,12 @@ export default function EmailSentPage() {
           </div>
         </div>
 
-        <div className="flex justify-left">
-          <button
-            onClick={handleConfirm}
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90"
-          >
-            확인
-          </button>
-        </div>
+        <button
+          onClick={handleConfirm}
+          className="w-2/5 h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90"
+        >
+          확인
+        </button>
       </div>
     </div>
   );

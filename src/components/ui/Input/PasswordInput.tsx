@@ -25,9 +25,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
           >
             {showPassword ? (
-              <EyeOff className="h-5 w-5" />
-            ) : (
               <Eye className="h-5 w-5" />
+            ) : (
+              <EyeOff className="h-5 w-5" />
             )}
           </button>
         </div>

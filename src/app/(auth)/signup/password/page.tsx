@@ -71,38 +71,51 @@ export default function SetPasswordPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-5">
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-[16px] text-black">비밀번호</label>
-                {error && <p className="text-[14px] text-[#FF3D5E]">{error}</p>}
+          <div>
+            <div className="mb-5">
+              <label className="block text-[16px] text-black mb-3">
+                비밀번호
+              </label>
+              <div className={error ? 'ring-1 ring-[#FF3D5E] rounded-lg' : ''}>
+                <PasswordInput
+                  value={password}
+                  onChange={(e) => setPasswordValue(e.target.value)}
+                  placeholder="비밀번호를 입력하세요"
+                  required
+                  disabled={isLoading}
+                />
               </div>
-              <PasswordInput
-                value={password}
-                onChange={(e) => setPasswordValue(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                required
-                disabled={isLoading}
-              />
+              {error && (
+                <p className="text-[14px] text-[#FF3D5E] mt-2">
+                  사용할수 없는 비밀번호입니다.
+                </p>
+              )}
             </div>
 
-            <div>
+            <div className="mb-8">
               <label className="block text-[16px] text-black mb-3">
                 비밀번호 확인
               </label>
-              <PasswordInput
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="비밀번호를 다시 입력하세요"
-                required
-                disabled={isLoading}
-              />
+              <div className={error ? 'ring-1 ring-[#FF3D5E] rounded-lg' : ''}>
+                <PasswordInput
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="비밀번호를 다시 입력하세요"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              {error && (
+                <p className="text-[14px] text-[#FF3D5E] mt-2">
+                  비밀번호가 일치하지 않습니다.
+                </p>
+              )}
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mt-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? '처리중...' : '확인'}

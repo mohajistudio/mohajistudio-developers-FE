@@ -90,37 +90,37 @@ export default function SetNickNamePage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-5">
-            <div>
-              <label className="block text-[16px] text-[#666666] mb-3">
-                email
-              </label>
-              <DisabledInput value={email} />
-            </div>
+          <div className="mb-5">
+            <label className="block text-[16px] text-[#666666] mb-3">
+              email
+            </label>
+            <DisabledInput value={email} />
+          </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="text-[16px] text-black">프로필 이름</label>
-                {error && <p className="text-[14px] text-[#FF3D5E]">{error}</p>}
-              </div>
+          <div className="mb-8">
+            <label className="block text-[16px] text-black mb-3">
+              프로필 이름
+            </label>
+            <div className={error ? 'ring-1 ring-[#FF3D5E] rounded-lg' : ''}>
               <Input
                 type="text"
                 placeholder="Mohaji_Developer"
                 value={nickname}
                 onChange={(e) => {
-                  console.log('[입력] 닉네임 변경:', e.target.value);
                   setNicknameValue(e.target.value);
                 }}
                 required
                 disabled={isLoading}
-                className={error ? 'border-[#FF3D5E]' : ''}
               />
             </div>
+            {error && (
+              <p className="text-[14px] text-[#FF3D5E] mt-2">{error}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 mt-[60px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[48px] bg-[#0A0A0A] text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? '처리중...' : '확인'}

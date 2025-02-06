@@ -8,6 +8,7 @@ import { FormEvent, useState, useEffect } from 'react';
 import { login } from '@/apis/auth/login';
 import { getAuthErrorMessage } from '@/utils/handle-error';
 import type { ApiError } from '@/types/auth';
+import axios from 'axios';
 
 export default function LoginPasswordPage() {
   const router = useRouter();
@@ -33,9 +34,29 @@ export default function LoginPasswordPage() {
     try {
       const response = await login({ email, password });
 
+      console.log('Login API response:', {
+        accessToken: response.accessToken ? 'present' : 'missing',
+        refreshToken: response.refreshToken ? 'present' : 'missing',
+        accessTokenPreview: response.accessToken?.substring(0, 20) + '...',
+        refreshTokenPreview: response.refreshToken?.substring(0, 20) + '...',
+      });
+
+      // 토큰 저장 전 확인
+      if (!response.accessToken) {
+        throw new Error('Access token is missing from response');
+      }
+
       // 토큰 저장
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
+
+      // 저장된 토큰 확인
+      console.log('Tokens after storage:', {
+        accessToken:
+          localStorage.getItem('accessToken')?.substring(0, 20) + '...',
+        refreshToken:
+          localStorage.getItem('refreshToken')?.substring(0, 20) + '...',
+      });
 
       // 임시 데이터 삭제
       localStorage.removeItem('tempEmail');
@@ -43,8 +64,13 @@ export default function LoginPasswordPage() {
       // 홈으로 이동
       router.push('/');
     } catch (error) {
-      if ('code' in (error as any)) {
-        setError(getAuthErrorMessage(error as ApiError));
+      console.error('Login error:', error);
+
+      if (axios.isAxiosError(error)) {
+        const apiError = error.response?.data as ApiError;
+        setError(getAuthErrorMessage(apiError));
+      } else if (error instanceof Error) {
+        setError(error.message);
       } else {
         setError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
       }
@@ -52,7 +78,6 @@ export default function LoginPasswordPage() {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="relative w-full">
       <button

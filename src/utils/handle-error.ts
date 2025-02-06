@@ -1,5 +1,7 @@
 import { ApiError, AUTH_ERROR_CODES } from '@/types/auth';
+import { MEDIA_ERROR_CODES } from '@/types/blog';
 
+// auth 관련
 export const getAuthErrorMessage = (error: ApiError): string => {
   switch (error.code) {
     case AUTH_ERROR_CODES.EXISTING_USER:
@@ -46,6 +48,26 @@ export const getAuthErrorMessage = (error: ApiError): string => {
 
     case AUTH_ERROR_CODES.NICKNAME_NOT_SET:
       return '설정되지 않은 닉네임입니다.';
+
+    default:
+      return error.message;
+  }
+};
+
+// 파일 업로드
+export const getMediaErrorMessage = (error: ApiError): string => {
+  switch (error.code) {
+    case MEDIA_ERROR_CODES.FILE_NOT_FOUND:
+      return '파일을 찾을 수 없습니다.';
+
+    case MEDIA_ERROR_CODES.STORAGE_UPLOAD_FAILED:
+      return '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
+    case MEDIA_ERROR_CODES.INVALID_FILE_FORMAT:
+      return '지원하지 않는 파일 형식입니다. 이미지 또는 동영상 파일만 업로드 가능합니다.';
+
+    case MEDIA_ERROR_CODES.UNKNOWN_USER:
+      return '등록되지 않은 사용자입니다.';
 
     default:
       return error.message;

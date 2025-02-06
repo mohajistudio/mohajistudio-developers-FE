@@ -2828,6 +2828,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-syntax-highlighter@npm:^15.5.13":
+  version: 15.5.13
+  resolution: "@types/react-syntax-highlighter@npm:15.5.13"
+  dependencies:
+    "@types/react": "*"
+  checksum: 55f751c140eb6641b16a5644af3b6fc25223957141085758ae6898948e70eaca33d8276e86e75d5d60939aff63af1d20278aba0d3a25483266f9deee1eb468e3
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*":
+  version: 19.0.8
+  resolution: "@types/react@npm:19.0.8"
+  dependencies:
+    csstype: ^3.0.2
+  checksum: 80dd2e7fa4b3e0ea2d883c21317563f4af1c4d90a6250c8bcbc052079304dc3335369267026004ed5d7cac09c7b0026e02e71ae5cca3150643507e353219fe47
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:^18":
   version: 18.3.14
   resolution: "@types/react@npm:18.3.14"
@@ -8218,6 +8236,7 @@ __metadata:
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
+    "@types/react-syntax-highlighter": ^15.5.13
     autoprefixer: ^10.0.1
     axios: ^1.7.9
     class-variance-authority: ^0.7.1
@@ -8233,6 +8252,7 @@ __metadata:
     prismjs: ^1.29.0
     react: ^18
     react-dom: ^18
+    react-icons: ^5.4.0
     react-markdown: ^9.0.3
     react-syntax-highlighter: ^15.6.1
     rehype-raw: ^7.0.0
@@ -9457,6 +9477,15 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 298954ecd8f78288dcaece05e88b570014d8f6dce5db6f66e6ee91448debeb59dcd31561dddb354eee47e6c1bb234669459060deb238ed0213497146e555a0b9
+  languageName: node
+  linkType: hard
+
+"react-icons@npm:^5.4.0":
+  version: 5.4.0
+  resolution: "react-icons@npm:5.4.0"
+  peerDependencies:
+    react: "*"
+  checksum: 6ee5fcda49d9628e33d97e955ed6ec9f30b26226a13b14d0f3f9a698d0d5dd2e3878af7de295e0241bdd8f46af96f16bfea1fd0647beddc447c1de98bdb2178e
   languageName: node
   linkType: hard
 

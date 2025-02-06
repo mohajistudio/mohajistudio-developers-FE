@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { getAuthErrorMessage } from '@/utils/handle-error';
 import { checkLoginStatus, login } from '@/apis/auth/login';
 import type { ApiError } from '@/types/auth';
@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      router.push('/');
+    }
+  }, [router]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

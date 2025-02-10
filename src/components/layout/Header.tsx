@@ -4,19 +4,29 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { SquarePen } from 'lucide-react';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { authState } from '@/store/auth';
 import ProfileDropdown from './ProfileDropdown';
 import { MdLogin } from 'react-icons/md';
 
-// 임시 사용자 데이터
-const userInfo = {
-  profileImage: 'https://api.dicebear.com/7.x/avataaars/svg?seed=리자노',
-  username: '리자노',
-};
-
 export default function Header() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [auth, setAuth] = useRecoilState(authState);
+
+  const handleLogout = () => {
+    // Recoil 상태 초기화
+    setAuth({
+      isLoggedIn: false,
+      userInfo: null,
+    });
+
+    // localStorage에서 토큰 제거
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
+    setIsDropdownOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#F2F3F5]">
@@ -31,24 +41,29 @@ export default function Header() {
         {/* 오른쪽 영역 (Developers 섹션과 동일한 width) */}
         <div className="w-[29%] flex justify-end">
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full">
-              <SquarePen className="w-5 h-5 text-gray-600" />
-            </button>
-            {isLoggedIn ? (
+            {/* 글쓰기 버튼은 로그인 상태일 때만 표시하고 /write로 이동 */}
+            {auth.isLoggedIn && (
+              <Link
+                href="/write"
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <SquarePen className="w-5 h-5 text-gray-600" />
+              </Link>
+            )}
+
+            {auth.isLoggedIn ? (
               <div className="relative">
                 <button
                   className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <img
-                    src={userInfo.profileImage}
+                    src={auth.userInfo?.profileImage}
                     alt="프로필"
                     className="w-full h-full object-cover"
                   />
                 </button>
-                {isDropdownOpen && (
-                  <ProfileDropdown onLogout={() => setIsLoggedIn(false)} />
-                )}
+                {isDropdownOpen && <ProfileDropdown onLogout={handleLogout} />}
               </div>
             ) : (
               <Link

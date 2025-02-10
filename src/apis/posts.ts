@@ -1,6 +1,11 @@
 import axios from 'axios';
-import { multipartInstance } from './instance';
+import { multipartInstance, instance } from './instance';
 import { ApiError } from '@/types/auth';
+import { Post, PostStatus } from '@/types/blog';
+import {
+  getPostErrorMessage,
+  getMediaErrorMessage,
+} from '@/utils/handle-error';
 
 export interface UploadedFile {
   id: string;
@@ -61,58 +66,59 @@ export const uploadMediaFiles = async (
       formData.append('files', file);
     });
 
-    try {
-      const response = await multipartInstance.post<UploadedFile[]>(
-        '/posts/media',
-        formData,
-      );
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error('Upload error details:', {
-          status: error.response?.status,
-          data: error.response?.data,
-          headers: error.response?.headers,
-          config: {
-            headers: error.config?.headers,
-            data: error.config?.data,
-          },
-        });
-
-        const status = error.response?.status;
-        const errorCode = error.response?.data?.code;
-        const errorMessage = error.response?.data?.message;
-
-        if (status === 401) {
-          throw new Error(
-            `인증 오류: ${errorMessage || '로그인이 필요합니다.'}`,
-          );
-        } else if (status === 400) {
-          if (errorCode === 'MF0001') {
-            throw new Error('파일을 찾을 수 없습니다.');
-          } else if (errorCode === 'MF0004') {
-            throw new Error(
-              '잘못된 파일 형식입니다. 이미지 또는 동영상 파일만 업로드 가능합니다.',
-            );
-          }
-          throw new Error(errorMessage || '잘못된 요청입니다.');
-        } else if (status === 404) {
-          throw new Error(errorMessage || '사용자를 찾을 수 없습니다.');
-        } else if (status === 500) {
-          throw new Error(
-            errorMessage || '파일 업로드에 실패했습니다. 다시 시도해주세요.',
-          );
-        }
-      }
-
-      if (error instanceof Error) {
-        throw error;
-      }
-
-      throw new Error('파일 업로드 중 오류가 발생했습니다.');
-    }
+    const response = await multipartInstance.post<UploadedFile[]>(
+      '/posts/media',
+      formData,
+    );
+    return response.data;
   } catch (error) {
     console.error('File upload failed:', error);
+    throw error;
+  }
+};
+
+interface CreatePostRequest {
+  title: string;
+  content: string;
+  summary?: string;
+  thumbnailId?: string;
+  status: PostStatus;
+  tags: string[];
+}
+
+export const createPost = async (postData: CreatePostRequest) => {
+  try {
+    // 요청 데이터 검증
+    if (!postData.title || !postData.content || !postData.status) {
+      throw new Error('필수 필드가 누락되었습니다.');
+    }
+
+    // 명시적으로 API 스펙에 맞는 데이터 구성
+    const requestData = {
+      title: postData.title.trim(),
+      content: postData.content.trim(),
+      summary: postData.summary?.trim(),
+      thumbnailId: postData.thumbnailId,
+      status: postData.status,
+      tags: Array.isArray(postData.tags) ? postData.tags : [],
+    };
+
+    console.log('Sending request:', {
+      url: '/posts',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      data: requestData,
+    });
+
+    const response = await instance.post<Post>('/posts', requestData);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorResponse = error.response?.data as ApiError;
+      throw new Error(getPostErrorMessage(errorResponse));
+    }
     throw error;
   }
 };

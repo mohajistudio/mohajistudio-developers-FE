@@ -127,3 +127,21 @@ export interface BlogPostDetailProps {
   onBack: () => void;
   onShare: () => void;
 }
+
+export const POST_ERROR_CODES = {
+  // 썸네일 관련 에러
+  INVALID_THUMBNAIL: 'C004',
+
+  // 인증 관련 에러
+  UNAUTHORIZED: 'P001',
+  INSUFFICIENT_PERMISSION: 'P002',
+
+  // 유효성 검사 관련 에러
+  INVALID_TITLE: 'P003',
+  INVALID_CONTENT: 'P004',
+  INVALID_SUMMARY: 'P005',
+  INVALID_STATUS: 'P006',
+
+  // 기타 에러
+  UNKNOWN_ERROR: 'P999',
+} as const;

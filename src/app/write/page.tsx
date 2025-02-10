@@ -1,4 +1,3 @@
-// src/app/write/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -6,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { WritePostData, PostStatus } from '@/types/blog';
 import WriteHeader from '@/components/editor/WriteHeader';
 import MarkdownPreview from '@/components/editor/MarkdownPreview';
+import { createPost } from '@/apis/posts';
+import { useRouter } from 'next/navigation';
 
 // 에디터 컴포넌트 동적 임포트
 const MarkdownEditor = dynamic(
@@ -21,6 +22,7 @@ const MarkdownEditor = dynamic(
 );
 
 export default function WritePage() {
+  const router = useRouter();
   const [postData, setPostData] = useState<WritePostData>({
     title: '',
     content: '',
@@ -39,20 +41,23 @@ export default function WritePage() {
     }
 
     try {
-      const draftData = {
-        ...postData,
-        status: PostStatus.DRAFT,
-        summary:
-          postData.content.slice(0, 150) +
-          (postData.content.length > 150 ? '...' : ''),
-        updatedAt: new Date().toISOString(),
-      };
+      const summary = postData.content.replace(/[#*`]/g, '').slice(0, 200);
 
-      console.log('임시저장:', draftData);
+      const response = await createPost({
+        title: postData.title.trim() || '제목 없음',
+        content: postData.content.trim(),
+        summary,
+        status: PostStatus.DRAFT,
+        tags: postData.tags,
+      });
+
       alert('임시저장 되었습니다.');
+      router.push(`/posts/${response.id}?status=draft`);
     } catch (error) {
       console.error('임시저장 실패:', error);
-      alert('임시저장에 실패했습니다.');
+      alert(
+        error instanceof Error ? error.message : '임시저장에 실패했습니다.',
+      );
     }
   };
 
@@ -74,21 +79,21 @@ export default function WritePage() {
 
     setIsSubmitting(true);
     try {
-      const publishData = {
-        ...postData,
-        status: PostStatus.PUBLISHED,
-        summary:
-          postData.content.slice(0, 150) +
-          (postData.content.length > 150 ? '...' : ''),
-        publishedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      const summary = postData.content.replace(/[#*`]/g, '').slice(0, 200);
 
-      console.log('출간하기:', publishData);
+      const response = await createPost({
+        title: postData.title.trim(),
+        content: postData.content.trim(),
+        summary,
+        status: PostStatus.PUBLISHED,
+        tags: postData.tags,
+      });
+
       alert('성공적으로 출간되었습니다.');
+      router.push(`/posts/${response.id}`);
     } catch (error) {
       console.error('출간 실패:', error);
-      alert('출간에 실패했습니다.');
+      alert(error instanceof Error ? error.message : '출간에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
     }

@@ -1,5 +1,6 @@
 import { ApiError, AUTH_ERROR_CODES } from '@/types/auth';
 import { MEDIA_ERROR_CODES } from '@/types/blog';
+import { POST_ERROR_CODES } from '@/types/blog';
 
 // auth 관련
 export const getAuthErrorMessage = (error: ApiError): string => {
@@ -71,5 +72,34 @@ export const getMediaErrorMessage = (error: ApiError): string => {
 
     default:
       return error.message;
+  }
+};
+
+// 게시글 관련 에러 처리
+export const getPostErrorMessage = (error: ApiError): string => {
+  switch (error.code) {
+    case POST_ERROR_CODES.INVALID_THUMBNAIL:
+      return '유효하지 않은 썸네일입니다.';
+
+    case POST_ERROR_CODES.UNAUTHORIZED:
+      return '로그인이 필요합니다.';
+
+    case POST_ERROR_CODES.INSUFFICIENT_PERMISSION:
+      return '게시글 작성 권한이 없습니다.';
+
+    case POST_ERROR_CODES.INVALID_TITLE:
+      return '제목은 1글자 이상 100글자 이하여야 합니다.';
+
+    case POST_ERROR_CODES.INVALID_CONTENT:
+      return '내용을 입력해주세요.';
+
+    case POST_ERROR_CODES.INVALID_SUMMARY:
+      return '요약글은 200자 미만이어야 합니다.';
+
+    case POST_ERROR_CODES.INVALID_STATUS:
+      return '잘못된 게시글 상태입니다.';
+
+    default:
+      return error.message || '게시글 작성에 실패했습니다.';
   }
 };

@@ -9,6 +9,8 @@ import { login } from '@/apis/auth/login';
 import { getAuthErrorMessage } from '@/utils/handle-error';
 import type { ApiError } from '@/types/auth';
 import axios from 'axios';
+import { useRecoilState } from 'recoil';
+import { authState } from '@/store/auth';
 
 export default function LoginPasswordPage() {
   const router = useRouter();
@@ -16,6 +18,7 @@ export default function LoginPasswordPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [auth, setAuth] = useRecoilState(authState);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem('tempEmail');
@@ -34,28 +37,24 @@ export default function LoginPasswordPage() {
     try {
       const response = await login({ email, password });
 
-      console.log('Login API response:', {
-        accessToken: response.accessToken ? 'present' : 'missing',
-        refreshToken: response.refreshToken ? 'present' : 'missing',
-        accessTokenPreview: response.accessToken?.substring(0, 20) + '...',
-        refreshTokenPreview: response.refreshToken?.substring(0, 20) + '...',
-      });
-
-      // 토큰 저장 전 확인
-      if (!response.accessToken) {
-        throw new Error('Access token is missing from response');
-      }
-
-      // 토큰 저장
+      // 토큰 저장 시 Bearer 접두사 없이 저장
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
 
       // 저장된 토큰 확인
-      console.log('Tokens after storage:', {
-        accessToken:
-          localStorage.getItem('accessToken')?.substring(0, 20) + '...',
-        refreshToken:
-          localStorage.getItem('refreshToken')?.substring(0, 20) + '...',
+      console.log('Stored tokens:', {
+        accessToken: localStorage.getItem('accessToken'),
+        refreshToken: localStorage.getItem('refreshToken'),
+      });
+
+      // Recoil 상태 업데이트
+      setAuth({
+        isLoggedIn: true,
+        userInfo: {
+          profileImage:
+            'https://api.dicebear.com/7.x/avataaars/svg?seed=리자노',
+          username: email.split('@')[0], // 임시로 이메일에서 사용자명 추출
+        },
       });
 
       // 임시 데이터 삭제
@@ -78,6 +77,7 @@ export default function LoginPasswordPage() {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="relative w-full">
       <button

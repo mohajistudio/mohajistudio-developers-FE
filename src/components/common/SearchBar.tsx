@@ -1,6 +1,6 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -29,8 +29,8 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     <section className="w-[71%] max-md:w-full">
       {/* Search 타이틀 */}
       <div className="flex items-center gap-2 mb-3">
-        <Search className="w-5 h-5" />
-        <h2 className="text-xl font-bold">Search</h2>
+        <Image src="/icon/Search.svg" alt="검색" width={24} height={24} />
+        <h2 className="text-base font-bold">Search</h2>
       </div>
 
       {/* 검색 입력창 */}

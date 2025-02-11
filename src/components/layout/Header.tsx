@@ -2,12 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { SquarePen } from 'lucide-react';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { authState } from '@/store/auth';
 import ProfileDropdown from './ProfileDropdown';
-import { MdLogin } from 'react-icons/md';
+import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname();
@@ -34,7 +33,13 @@ export default function Header() {
         {/* 왼쪽 영역 (PostCard와 동일한 width) */}
         <div className="w-[71%]">
           <Link href="/" className="text-2xl font-bold text-[#0A0A0A]">
-            Mohaji Developers
+            <Image
+              src="/icon/logo.svg"
+              alt="Mohaji Developers Logo"
+              width={123}
+              height={28}
+              priority
+            />
           </Link>
         </div>
 
@@ -47,7 +52,12 @@ export default function Header() {
                 href="/write"
                 className="p-2 hover:bg-gray-100 rounded-full"
               >
-                <SquarePen className="w-5 h-5 text-gray-600" />
+                <Image
+                  src="/icon/Edit.svg"
+                  alt="글쓰기"
+                  width={24}
+                  height={24}
+                />
               </Link>
             )}
 
@@ -70,7 +80,12 @@ export default function Header() {
                 href="/login"
                 className="p-2 hover:bg-gray-100 rounded-full"
               >
-                <MdLogin className="w-5 h-5 text-gray-600" />
+                <Image
+                  src="/icon/Login.svg"
+                  alt="로그인"
+                  width={24}
+                  height={24}
+                />
               </Link>
             )}
           </div>

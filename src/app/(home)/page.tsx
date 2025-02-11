@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Search, Tags, FileText, Users } from 'lucide-react';
+import Image from 'next/image';
 import SearchBar from '@/components/common/SearchBar';
 import BlogPostCard from '@/components/blog/BlogPostCard';
 import DeveloperCard from '@/components/common/DeveloperCard';
@@ -66,8 +66,13 @@ export default function HomePage() {
                 <section>
                   {/* 태그 필터 섹션 */}
                   <div className="mb-14">
-                    <div className="flex gap-2 items-center mb-3 text-xl font-bold text-black">
-                      <Tags className="w-6 h-6 text-[#0A0A0A]" />
+                    <div className="flex gap-2 items-center mb-3 text-base font-bold text-black">
+                      <Image
+                        src="/icon/Tag.svg"
+                        alt="태그"
+                        width={24}
+                        height={24}
+                      />
                       <div>Tags</div>
                     </div>
                     {/* 태그 목록 */}
@@ -90,8 +95,13 @@ export default function HomePage() {
 
                   {/* 게시물 목록 섹션 */}
                   <div>
-                    <div className="flex gap-2 items-center mb-3 text-xl font-bold text-black">
-                      <FileText className="w-6 h-6 text-[#0A0A0A]" />
+                    <div className="flex gap-2 items-center mb-3 text-base font-bold text-black">
+                      <Image
+                        src="/icon/File.svg"
+                        alt="게시물"
+                        width={24}
+                        height={24}
+                      />
                       <div>All Post</div>
                     </div>
                     {/* 게시물 카드 목록 */}
@@ -110,8 +120,13 @@ export default function HomePage() {
               <aside className="w-[29%] max-md:w-full max-sm:w-full">
                 <div>
                   {/* 개발자 목록 헤더 */}
-                  <div className="flex gap-2 items-center mb-3 text-xl font-bold text-black">
-                    <Users className="w-6 h-6 text-[#0A0A0A]" />
+                  <div className="flex gap-2 items-center mb-3 text-base font-bold text-black">
+                    <Image
+                      src="/icon/Users.svg"
+                      alt="개발자"
+                      width={24}
+                      height={24}
+                    />
                     <div>Developers</div>
                   </div>
                   {/* 개발자 카드 목록 */}

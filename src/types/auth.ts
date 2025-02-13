@@ -31,6 +31,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  id: string;
+  email: string;
+  nickname: string;
+  profileImage?: string;
+  role: string;
   accessToken: string;
   refreshToken: string;
 }

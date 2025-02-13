@@ -29,6 +29,7 @@ const checkUserRole = () => {
   return decoded?.role;
 };
 
+// 기본 인스턴스
 export const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -37,12 +38,21 @@ export const instance = axios.create({
   withCredentials: true,
 });
 
+// 멀티파트 요청용 인스턴스
 export const multipartInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'multipart/form-data',
   },
   withCredentials: true,
+});
+
+// 서버 컴포넌트용 인스턴스 (토큰 관련 로직 제외)
+export const serverInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // 토큰 재발급 진행 중인지 확인하는 플래그
@@ -108,20 +118,24 @@ const refreshTokens = async () => {
   }
 };
 
-// 요청 인터셉터
-const requestInterceptor = (config: any) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    const role = checkUserRole();
-    console.log('Current user role for request:', role);
+// 클라이언트 사이드에서만 인터셉터 적용
+if (typeof window !== 'undefined') {
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-};
-
-instance.interceptors.request.use(requestInterceptor);
-multipartInstance.interceptors.request.use(requestInterceptor);
+  multipartInstance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+}
 
 // 응답 인터셉터
 const responseInterceptor = async (error: AxiosError) => {
@@ -171,6 +185,7 @@ const responseInterceptor = async (error: AxiosError) => {
   return Promise.reject(error);
 };
 
+// 응답 인터셉터 적용
 instance.interceptors.response.use((response) => response, responseInterceptor);
 
 multipartInstance.interceptors.response.use(

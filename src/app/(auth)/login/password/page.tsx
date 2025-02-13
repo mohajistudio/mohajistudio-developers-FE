@@ -51,9 +51,7 @@ export default function LoginPasswordPage() {
       setAuth({
         isLoggedIn: true,
         userInfo: {
-          profileImage:
-            'https://api.dicebear.com/7.x/avataaars/svg?seed=리자노',
-          username: email.split('@')[0], // 임시로 이메일에서 사용자명 추출
+          profileImage: '', // 외부 이미지 URL 대신 빈 문자열로 설정
         },
       });
 

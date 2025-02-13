@@ -15,9 +15,7 @@ function AuthInitializer() {
       setAuth({
         isLoggedIn: true,
         userInfo: {
-          profileImage:
-            'https://api.dicebear.com/7.x/avataaars/svg?seed=리자노',
-          username: '사용자', // 실제 사용자 정보로 대체 필요
+          profileImage: '',
         },
       });
     }

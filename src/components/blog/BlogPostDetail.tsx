@@ -1,22 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Post, TocItem } from '@/types/blog';
 import { formatDate } from '@/utils/date';
-import { normalizeMarkdown, extractTocItems } from '@/utils/markdown';
-import TableOfContents from './TableOfContents';
+import TableOfContents from '@/app/posts/[id]/TableOfContents';
 import TagList from '@/components/common/TagList';
 import ProfileImage from '@/components/common/ProfileImage';
-import { getPost } from '@/apis/posts';
 import { ArrowUp } from 'lucide-react';
-import MarkdownPreview from '@/components/editor/MarkdownPreview';
 
-export default function PostDetail({ params }: { params: { id: string } }) {
-  const router = useRouter();
-  const [post, setPost] = useState<Post | null>(null);
-  const [tocItems, setTocItems] = useState<TocItem[]>([]);
+interface BlogPostDetailProps {
+  post: Post;
+  tocItems: TocItem[];
+  onBack: () => void;
+  onShare: () => void;
+}
+
+export default function BlogPostDetail({
+  post,
+  tocItems,
+  onBack,
+  onShare,
+}: BlogPostDetailProps) {
   const [showTopButton, setShowTopButton] = useState(false);
 
   // 스크롤 위치에 따라 Top 버튼 표시 여부 결정
@@ -34,42 +39,13 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const data = await getPost(params.id);
-        console.log('서버에서 받아온 원본 content:', data.content); // 여기 추가
-
-        // 마크다운 정규화 적용
-        const formattedContent = normalizeMarkdown(data.content);
-        console.log('정규화 후 content:', formattedContent); // 여기 추가
-
-        // 목차 아이템 추출
-        const items = extractTocItems(formattedContent);
-
-        setTocItems(items);
-        setPost({
-          ...data,
-          content: formattedContent,
-        });
-      } catch (error) {
-        console.error('게시글을 불러오는데 실패했습니다:', error);
-        router.push('/');
-      }
-    };
-
-    fetchPost();
-  }, [params.id, router]);
-
-  if (!post) return null;
-
   return (
     <div className="flex flex-col items-center px-20 pt-9 pb-36 bg-[#F2F3F5] relative">
       <div className="w-full max-w-[1240px]">
         {/* 상단 네비게이션 */}
         <div className="flex justify-between items-center mb-4">
           <button
-            onClick={() => router.back()}
+            onClick={onBack}
             className="flex items-center gap-2 text-black font-bold"
           >
             <svg
@@ -133,12 +109,12 @@ export default function PostDetail({ params }: { params: { id: string } }) {
               )}
 
               {/* 본문 내용 */}
-              <div className="prose prose-neutral max-w-none">
-                <MarkdownPreview
-                  content={post.content}
-                  title="" // 제목은 이미 상단에 표시되어 있으므로 빈 문자열
-                />
-              </div>
+              <div
+                className="text-[#4D4D4D] leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: post.content,
+                }}
+              />
 
               {/* Top 버튼 */}
               <div className="flex justify-end mt-10">

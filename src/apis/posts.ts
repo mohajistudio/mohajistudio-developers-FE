@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { multipartInstance, instance } from './instance';
+import { multipartInstance, instance, serverInstance } from './instance';
 import { ApiError } from '@/types/auth';
-import { Post, PostStatus } from '@/types/blog';
+import { Post, PostStatus, PaginatedResponse } from '@/types/blog';
 import {
   getPostErrorMessage,
   getMediaErrorMessage,
@@ -88,12 +88,6 @@ interface CreatePostRequest {
 
 export const createPost = async (postData: CreatePostRequest) => {
   try {
-    // 요청 데이터 검증
-    if (!postData.title || !postData.content || !postData.status) {
-      throw new Error('필수 필드가 누락되었습니다.');
-    }
-
-    // 명시적으로 API 스펙에 맞는 데이터 구성
     const requestData = {
       title: postData.title.trim(),
       content: postData.content.trim(),
@@ -103,18 +97,130 @@ export const createPost = async (postData: CreatePostRequest) => {
       tags: Array.isArray(postData.tags) ? postData.tags : [],
     };
 
-    console.log('Sending request:', {
-      url: '/posts',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-      data: requestData,
-    });
+    console.log('Creating post with data:', requestData);
 
-    const response = await instance.post<Post>('/posts', requestData);
+    // 서버가 ID만 반환하므로 string 타입으로 응답을 받음
+    const response = await instance.post<string>('/posts', requestData);
+
+    console.log('Server response:', response.data);
+
+    // 응답이 문자열(ID)인 경우를 처리
+    if (typeof response.data === 'string') {
+      return {
+        id: response.data,
+        ...requestData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        userId: '', // 실제 userId는 서버에서 설정됨
+        viewCount: 0,
+        tags: [], // 태그 정보는 목록 조회 시 가져올 수 있음
+        user: {
+          // 사용자 정보도 목록 조회 시 가져올 수 있음
+          id: '',
+          username: '',
+        },
+      } as Post;
+    }
+
+    throw new Error('게시글 생성 실패: 잘못된 서버 응답 형식');
+  } catch (error) {
+    console.error('Create post error:', error);
+    if (axios.isAxiosError(error)) {
+      const errorResponse = error.response?.data as ApiError;
+      throw new Error(getPostErrorMessage(errorResponse));
+    }
+    throw error;
+  }
+};
+
+// 서버 사이드용 getPosts
+export const getPostsServer = async ({
+  page = 0,
+  size = 20,
+  search,
+  tags,
+  userId,
+}: {
+  page?: number;
+  size?: number;
+  search?: string;
+  tags?: string[];
+  userId?: string;
+}): Promise<PaginatedResponse<Post>> => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    searchParams.append('page', page.toString());
+    searchParams.append('size', size.toString());
+
+    if (search) searchParams.append('search', search);
+    if (userId) searchParams.append('userId', userId);
+    if (tags?.length) {
+      tags.forEach((tag) => searchParams.append('tags', tag));
+    }
+
+    const response = await serverInstance.get<PaginatedResponse<Post>>(
+      `/posts?${searchParams.toString()}`,
+    );
+
     return response.data;
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorResponse = error.response?.data as ApiError;
+      throw new Error(getPostErrorMessage(errorResponse));
+    }
+    throw error;
+  }
+};
+
+// 클라이언트 사이드용 getPosts
+export const getPosts = async ({
+  page = 0,
+  size = 20,
+  search,
+  tags,
+  userId,
+}: {
+  page?: number;
+  size?: number;
+  search?: string;
+  tags?: string[];
+  userId?: string;
+}): Promise<PaginatedResponse<Post>> => {
+  try {
+    const searchParams = new URLSearchParams();
+
+    searchParams.append('page', page.toString());
+    searchParams.append('size', size.toString());
+
+    if (search) searchParams.append('search', search);
+    if (userId) searchParams.append('userId', userId);
+    if (tags?.length) {
+      tags.forEach((tag) => searchParams.append('tags', tag));
+    }
+
+    const response = await instance.get<PaginatedResponse<Post>>(
+      `/posts?${searchParams.toString()}`,
+    );
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorResponse = error.response?.data as ApiError;
+      throw new Error(getPostErrorMessage(errorResponse));
+    }
+    throw error;
+  }
+};
+
+// 게시글 상세 조회
+export const getPost = async (postId: string): Promise<Post> => {
+  try {
+    const response = await instance.get<Post>(`/posts/${postId}`);
+    console.log('Server response data:', response.data); // 서버 응답 데이터 확인
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch post:', error);
     if (axios.isAxiosError(error)) {
       const errorResponse = error.response?.data as ApiError;
       throw new Error(getPostErrorMessage(errorResponse));

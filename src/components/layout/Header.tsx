@@ -7,6 +7,7 @@ import { useRecoilState } from 'recoil';
 import { authState } from '@/store/auth';
 import ProfileDropdown from './ProfileDropdown';
 import Image from 'next/image';
+import ProfileImage from '@/components/common/ProfileImage';
 
 export default function Header() {
   const pathname = usePathname();
@@ -14,15 +15,14 @@ export default function Header() {
   const [auth, setAuth] = useRecoilState(authState);
 
   const handleLogout = () => {
+    // localStorage 완전 초기화
+    localStorage.clear(); // 모든 데이터 삭제
+
     // Recoil 상태 초기화
     setAuth({
       isLoggedIn: false,
       userInfo: null,
     });
-
-    // localStorage에서 토큰 제거
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
 
     setIsDropdownOpen(false);
   };
@@ -50,7 +50,7 @@ export default function Header() {
             {auth.isLoggedIn && (
               <Link
                 href="/write"
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 rounded-full hover:bg-[#000000] hover:bg-opacity-40 transition-all"
               >
                 <Image
                   src="/icon/Edit.svg"
@@ -64,21 +64,34 @@ export default function Header() {
             {auth.isLoggedIn ? (
               <div className="relative">
                 <button
-                  className="w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+                  className="w-8 h-8 rounded-full overflow-hidden group transition-all"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <img
-                    src={auth.userInfo?.profileImage}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="w-full h-full">
+                    {auth.userInfo?.profileImage ? (
+                      <img
+                        src={auth.userInfo.profileImage}
+                        alt="프로필"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full bg-gray-100 group-hover:bg-[#000000] group-hover:bg-opacity-40">
+                        <Image
+                          src="/icon/User.svg"
+                          alt="프로필"
+                          width={24}
+                          height={24}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </button>
                 {isDropdownOpen && <ProfileDropdown onLogout={handleLogout} />}
               </div>
             ) : (
               <Link
                 href="/login"
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2 rounded-full hover:bg-black/40 transition-all"
               >
                 <Image
                   src="/icon/Login.svg"

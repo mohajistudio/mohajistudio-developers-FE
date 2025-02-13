@@ -1,36 +1,36 @@
 interface ProfileImageProps {
-  username: string;
-  size?: 'sm' | 'md' | 'lg';
+  nickname?: string;
+  size?: number;
 }
 
-const sizeMap = {
-  sm: 'w-8 h-8',
-  md: 'w-10 h-10',
-  lg: 'w-12 h-12',
-};
-
-const colorMap = [
-  'bg-blue-100 text-blue-600',
-  'bg-green-100 text-green-600',
-  'bg-purple-100 text-purple-600',
-  'bg-yellow-100 text-yellow-600',
-  'bg-pink-100 text-pink-600',
-];
-
 export default function ProfileImage({
-  username,
-  size = 'md',
+  nickname = 'Anonymous',
+  size = 40,
 }: ProfileImageProps) {
+  const colorMap = [
+    'bg-red-500',
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-yellow-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+  ];
+
   // 사용자 이름을 기반으로 일관된 색상 선택
   const colorIndex =
-    username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    nickname.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
     colorMap.length;
 
   return (
     <div
-      className={`${sizeMap[size]} rounded-full flex items-center justify-center font-medium ${colorMap[colorIndex]}`}
+      className={`relative rounded-full overflow-hidden ${colorMap[colorIndex]}`}
+      style={{ width: size, height: size }}
     >
-      {username[0].toUpperCase()}
+      {/* 프로필 이미지가 있는 경우 */}
+      <div className="flex items-center justify-center w-full h-full text-white font-bold">
+        {nickname.charAt(0).toUpperCase()}
+      </div>
     </div>
   );
 }

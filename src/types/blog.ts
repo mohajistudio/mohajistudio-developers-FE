@@ -1,5 +1,3 @@
-// src/types/blog.ts
-
 // 게시글 상태 enum
 export enum PostStatus {
   DRAFT = 'DRAFT', // 임시저장
@@ -16,15 +14,17 @@ export enum ContentType {
 
 // 사용자 정보 타입
 export interface User {
-  id: string; // UUID
-  username: string;
-  profileImage?: string;
+  id: string;
+  nickname: string;
+  email: string;
+  profileImageUrl?: string;
+  role: string;
 }
 
 // 태그 타입
 export interface Tag {
-  id: string; // UUID
-  name: string;
+  id: string;
+  title: string; // name -> title로 변경
 }
 
 // 미디어 파일 타입
@@ -52,19 +52,20 @@ export interface WritePostData {
 
 // 게시글 응답 데이터 타입 (DTO 기반)
 export interface Post {
-  id: string; // UUID
-  user: User;
-  title: string;
-  summary?: string; // optional, 최대 200자
-  thumbnail?: string;
-  status: PostStatus;
-  publishedAt?: string; // ISO 날짜 문자열, optional
+  id: string;
   createdAt: string;
   updatedAt: string;
-  tags: Tag[];
+  userId: string;
+  user: User;
+  title: string;
   content: string;
+  summary?: string;
+  thumbnail?: string;
+  thumbnailId?: string;
+  status: PostStatus;
+  publishedAt?: string;
   viewCount: number;
-  mediaFiles?: MediaFile[]; // optional
+  tags: Tag[];
 }
 
 // 게시글 목록 조회시 사용할 타입
@@ -81,11 +82,12 @@ export interface PostListItem {
 
 // 페이지네이션을 위한 타입
 export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
+  content: T[]; // items -> content로 변경
   page: number;
-  pageSize: number;
-  hasMore: boolean;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }
 
 // 게시글 필터링/정렬 옵션

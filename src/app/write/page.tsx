@@ -44,7 +44,7 @@ export default function WritePage() {
       const summary = postData.content.replace(/[#*`]/g, '').slice(0, 200);
 
       const response = await createPost({
-        title: postData.title.trim() || '제목 없음',
+        title: postData.title.trim(),
         content: postData.content.trim(),
         summary,
         status: PostStatus.DRAFT,
@@ -52,7 +52,7 @@ export default function WritePage() {
       });
 
       alert('임시저장 되었습니다.');
-      router.push(`/posts/${response.id}?status=draft`);
+      router.push(`/posts/${response.id}`);
     } catch (error) {
       console.error('임시저장 실패:', error);
       alert(
@@ -62,6 +62,9 @@ export default function WritePage() {
   };
 
   const handlePublish = async () => {
+    // 게시글 작성 시 content 확인
+    console.log('작성된 content:', postData.content);
+
     if (!postData.title.trim()) {
       alert('제목을 입력해주세요.');
       return;

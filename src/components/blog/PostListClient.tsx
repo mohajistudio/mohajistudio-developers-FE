@@ -15,7 +15,13 @@ export default function PostListClient({
   initialData,
   searchParams,
 }: PostListClientProps) {
-  const [posts, setPosts] = useState<Post[]>(initialData.content);
+  const [posts, setPosts] = useState<Post[]>(
+    initialData.content.sort((a, b) => {
+      const dateA = new Date(a.publishedAt || a.createdAt);
+      const dateB = new Date(b.publishedAt || b.createdAt);
+      return dateB.getTime() - dateA.getTime();
+    }),
+  );
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(!initialData.last);
 
@@ -35,7 +41,18 @@ export default function PostListClient({
             : undefined,
       });
 
-      setPosts((prev) => [...prev, ...response.content]);
+      setPosts((prev) => {
+        const newPosts = response.content.filter(
+          (newPost) =>
+            !prev.some((existingPost) => existingPost.id === newPost.id),
+        );
+        return [...prev, ...newPosts].sort((a, b) => {
+          const dateA = new Date(a.publishedAt || a.createdAt);
+          const dateB = new Date(b.publishedAt || b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+      });
+
       setPage(nextPage);
       setHasMore(!response.last);
     } catch (error) {

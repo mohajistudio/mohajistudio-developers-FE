@@ -172,7 +172,11 @@ export default function WritePage() {
 
       {/* 오른쪽 프리뷰 패널 */}
       <div className="w-1/2">
-        <MarkdownPreview content={postData.content} title={postData.title} />
+        <MarkdownPreview
+          content={postData.content}
+          isPreview={true}
+          title={postData.title}
+        />
       </div>
     </div>
   );

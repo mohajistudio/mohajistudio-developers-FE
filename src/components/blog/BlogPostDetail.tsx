@@ -8,6 +8,7 @@ import TableOfContents from '@/app/posts/[id]/TableOfContents';
 import TagList from '@/components/common/TagList';
 import ProfileImage from '@/components/common/ProfileImage';
 import { ArrowUp } from 'lucide-react';
+import MarkdownPreview from '@/components/editor/MarkdownPreview';
 
 interface BlogPostDetailProps {
   post: Post;
@@ -38,6 +39,8 @@ export default function BlogPostDetail({
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const normalizedContent = post.content.replace(/<[^>]+>/g, '');
 
   return (
     <div className="flex flex-col items-center px-20 pt-9 pb-36 bg-[#F2F3F5] relative">
@@ -109,12 +112,9 @@ export default function BlogPostDetail({
               )}
 
               {/* 본문 내용 */}
-              <div
-                className="text-[#4D4D4D] leading-relaxed"
-                dangerouslySetInnerHTML={{
-                  __html: post.content,
-                }}
-              />
+              <div className="prose max-w-none">
+                <MarkdownPreview content={post.content} />
+              </div>
 
               {/* Top 버튼 */}
               <div className="flex justify-end mt-10">

@@ -5,13 +5,15 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Components } from 'react-markdown';
+import type { Components } from 'react-markdown';
+import type { ElementType } from 'react';
 
 interface MarkdownPreviewProps {
   content: string;
-  title: string;
+  isPreview?: boolean; // 프리뷰 모드인지 여부
+  title?: string; // 프리뷰일 때만 사용
 }
 
 // 커스텀 테마 설정
@@ -39,18 +41,25 @@ const customTheme = {
   'token.constant': { ...oneLight['token.constant'], background: 'none' },
 };
 
-export default function MarkdownPreview({
+// CodeComponent 타입 정의
+type CodeComponentProps = Components['code'] & {
+  inline?: boolean;
+};
+
+const MarkdownPreview = ({
   content,
+  isPreview = false,
   title,
-}: MarkdownPreviewProps) {
-  // code 컴포넌트를 분리하여 타입 에러 해결
-  const CodeComponent: Components['code'] = ({
+}: MarkdownPreviewProps) => {
+  // CodeComponent를 직접 Components['code']로 타입 지정하지 않고
+  // ReactMarkdown의 components prop에서 타입을 추론하도록 함
+  const CodeComponent = ({
     node,
     inline,
     className,
     children,
     ...props
-  }) => {
+  }: any) => {
     const match = /language-(\w+)/.exec(className || '');
 
     if (inline) {
@@ -77,6 +86,7 @@ export default function MarkdownPreview({
           <span className="language-label">{language.toUpperCase()}</span>
         </div>
         <div className="code-block-content">
+          {/* @ts-ignore */}
           <SyntaxHighlighter
             language={language}
             style={customTheme}
@@ -86,14 +96,13 @@ export default function MarkdownPreview({
               padding: '1rem',
               fontSize: '14px',
               fontFamily: 'Pretendard',
-              tabSize: 2, // 탭 크기 설정
-              lineHeight: '1.5', // 줄 간격 설정
+              tabSize: 2,
+              lineHeight: '1.5',
             }}
             PreTag="div"
             wrapLines={true}
             wrapLongLines={true}
-            showLineNumbers={true} // 라인 넘버 표시
-            {...props}
+            showLineNumbers={true}
           >
             {String(children).replace(/\n$/, '')}
           </SyntaxHighlighter>
@@ -102,69 +111,75 @@ export default function MarkdownPreview({
     );
   };
 
+  const components: Components = {
+    code: CodeComponent,
+    a: ({ node, children, href, ...props }) => (
+      <a
+        href={href}
+        className="text-[#FF8C42] hover:underline"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    ),
+    h1: ({ node, children, ...props }) => (
+      <h1 className="text-[30px] font-bold text-black mt-8 mb-4" {...props}>
+        {children}
+      </h1>
+    ),
+    h2: ({ node, children, ...props }) => (
+      <h2 className="text-[24px] font-bold text-black mt-6 mb-4" {...props}>
+        {children}
+      </h2>
+    ),
+    h3: ({ node, children, ...props }) => (
+      <h3 className="text-[20px] font-bold text-black mt-5 mb-3" {...props}>
+        {children}
+      </h3>
+    ),
+    p: ({ node, children, ...props }) => (
+      <p
+        className="text-[16px] leading-7 text-[#4D4D4D] mb-4 whitespace-pre-line"
+        {...props}
+      >
+        {children}
+      </p>
+    ),
+    ul: ({ node, children, ...props }) => (
+      <ul className="list-disc list-inside space-y-1 my-4" {...props}>
+        {children}
+      </ul>
+    ),
+    ol: ({ node, children, ...props }) => (
+      <ol className="list-decimal list-inside space-y-1 my-4" {...props}>
+        {children}
+      </ol>
+    ),
+    blockquote: ({ node, children, ...props }) => (
+      <blockquote
+        className="border-l-4 border-[#FF8C42] bg-[#F9F9F9] px-4 py-3 my-4 text-[#666666]"
+        {...props}
+      >
+        {children}
+      </blockquote>
+    ),
+  };
+
   return (
     <div className="h-full bg-surface1 overflow-y-auto px-8 py-6">
-      <h1 className="text-[30px] font-bold mb-8 text-black">
-        {title || '제목 없음'}
-      </h1>
+      {/* 프리뷰 모드일 때만 제목 표시 */}
+      {isPreview && (
+        <h1 className="text-[30px] font-bold mb-8 text-black">
+          {title || '제목 없음'}
+        </h1>
+      )}
       <div className="prose prose-neutral max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, rehypeSanitize]}
-          breaks={true}
-          components={{
-            code: CodeComponent,
-            // 링크 스타일
-            a: ({ children, href }) => (
-              <a
-                href={href}
-                className="text-[#FF8C42] hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {children}
-              </a>
-            ),
-            // 헤딩 스타일
-            h1: ({ children }) => (
-              <h1 className="text-[30px] font-bold text-black mt-8 mb-4">
-                {children}
-              </h1>
-            ),
-            h2: ({ children }) => (
-              <h2 className="text-[24px] font-bold text-black mt-6 mb-4">
-                {children}
-              </h2>
-            ),
-            h3: ({ children }) => (
-              <h3 className="text-[20px] font-bold text-black mt-5 mb-3">
-                {children}
-              </h3>
-            ),
-            // 단락 스타일 - 줄바꿈 처리 추가
-            p: ({ children }) => (
-              <p className="text-[16px] leading-7 text-[#4D4D4D] mb-4 whitespace-pre-line">
-                {children}
-              </p>
-            ),
-            // 목록 스타일
-            ul: ({ children }) => (
-              <ul className="list-disc list-inside space-y-1 my-4">
-                {children}
-              </ul>
-            ),
-            ol: ({ children }) => (
-              <ol className="list-decimal list-inside space-y-1 my-4">
-                {children}
-              </ol>
-            ),
-            // 인용구 스타일
-            blockquote: ({ children }) => (
-              <blockquote className="border-l-4 border-[#FF8C42] bg-[#F9F9F9] px-4 py-3 my-4 text-[#666666]">
-                {children}
-              </blockquote>
-            ),
-          }}
+          components={components}
         >
           {content}
         </ReactMarkdown>
@@ -301,4 +316,6 @@ export default function MarkdownPreview({
       `}</style>
     </div>
   );
-}
+};
+
+export default MarkdownPreview;

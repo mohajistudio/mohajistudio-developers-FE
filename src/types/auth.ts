@@ -40,6 +40,10 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
+export interface EmailVerificationRequestResponse {
+  expiredAt: string;
+}
+
 {
   /* 에러 코드 상수 */
 }
@@ -79,4 +83,7 @@ export const AUTH_ERROR_CODES = {
 
   // Request Param을 넘기지 않았을 경우(필수 매개변수 누락): 400
   MISSING_PARAMETER: 'C003',
+
+  // 인증 코드가 일치하지 않을 경우 : 400
+  INVALID_CODE: 'EV0004',
 } as const;

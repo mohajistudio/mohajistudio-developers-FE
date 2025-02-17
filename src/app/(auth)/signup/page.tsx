@@ -20,9 +20,12 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      await requestEmailVerification(email);
-      console.log('Redirecting with email:', email);
-      router.push(`/verify/email/sent?email=${encodeURIComponent(email)}`);
+      const response = await requestEmailVerification(email);
+
+      localStorage.setItem('tempEmail', email);
+      router.push(
+        `/verify/email?email=${encodeURIComponent(email)}&expiredAt=${encodeURIComponent(response.expiredAt)}`,
+      );
     } catch (error) {
       if ('code' in (error as any)) {
         setError(getAuthErrorMessage(error as ApiError));

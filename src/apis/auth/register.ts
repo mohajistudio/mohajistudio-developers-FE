@@ -5,14 +5,16 @@ import {
   type ApiError,
   EmailVerificationResponse,
   type SetNickNameRequest,
+  type EmailVerificationRequestResponse,
 } from '@/types/auth';
 
 //   이메일 인증 코드 발급
 export const requestEmailVerification = async (email: string) => {
   try {
-    const response = await instance.post<void>('/auth/register/email/request', {
-      email,
-    });
+    const response = await instance.post<EmailVerificationRequestResponse>(
+      '/auth/register/email-verification/request',
+      { email },
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data) {
@@ -25,15 +27,13 @@ export const requestEmailVerification = async (email: string) => {
 //   이메일 인증 코드 확인
 export const verifyEmailCode = async (email: string, code: string) => {
   try {
-    // console.log('Request Data:', { email, code });
     const response = await instance.post<EmailVerificationResponse>(
-      '/auth/register/email/verify',
+      '/auth/register/email-verification/verify',
       { email, code },
     );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.data) {
-      console.log('Error Response:', error.response?.data);
       throw error.response.data as ApiError;
     }
     throw error;

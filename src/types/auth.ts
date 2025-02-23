@@ -87,3 +87,8 @@ export const AUTH_ERROR_CODES = {
   // 인증 코드가 일치하지 않을 경우 : 400
   INVALID_CODE: 'EV0004',
 } as const;
+
+export const USER_ERROR_CODES = {
+  FETCH_FAILED: 'U0002',
+  INVALID_ROLE: 'U0003',
+} as const;

@@ -3,9 +3,9 @@ import SearchBar from '@/components/common/SearchBar';
 import TagList from '@/components/common/TagList';
 import PostListClient from '@/components/blog/PostListClient';
 import { mockTags } from '@/mocks/tags';
-import { mockDevelopers } from '@/mocks/developers';
 import Image from 'next/image';
 import DeveloperCard from '@/components/common/DeveloperCard';
+import { getDevelopers } from '@/apis/users';
 
 export default async function HomePage({
   searchParams,
@@ -13,16 +13,31 @@ export default async function HomePage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // 초기 데이터 서버에서 페칭
-  const initialData = await getPostsServer({
-    page: 0,
-    size: 20,
-    search: searchParams.search as string,
-    tags: Array.isArray(searchParams.tags)
-      ? searchParams.tags
-      : searchParams.tags
-        ? [searchParams.tags]
-        : undefined,
-  });
+  const [initialData, developers] = await Promise.allSettled([
+    getPostsServer({
+      page: 0,
+      size: 20,
+      search: searchParams.search as string,
+      tags: Array.isArray(searchParams.tags)
+        ? searchParams.tags
+        : searchParams.tags
+          ? [searchParams.tags]
+          : undefined,
+    }),
+    getDevelopers(),
+  ]).then(([postsResult, developersResult]) => [
+    postsResult.status === 'fulfilled'
+      ? postsResult.value
+      : {
+          content: [],
+          page: 0,
+          size: 20,
+          totalElements: 0,
+          totalPages: 0,
+          last: true,
+        },
+    developersResult.status === 'fulfilled' ? developersResult.value : [],
+  ]);
 
   return (
     <div className="flex overflow-hidden flex-col items-center px-20 pt-9 pb-40 max-md:px-5 max-md:pt-9 max-md:pb-24 max-sm:p-5">
@@ -83,12 +98,15 @@ export default async function HomePage({
                   </div>
                   {/* 개발자 카드 목록 */}
                   <div className="px-5 py-6 rounded-2xl bg-[#F9F9F9] shadow-[0px_0px_8px_rgba(0,0,0,0.02)]">
-                    {mockDevelopers.map((developer) => (
+                    {developers.map((developer) => (
                       <DeveloperCard
                         key={developer.id}
-                        username={developer.username}
-                        role={developer.role}
-                        profileImage={developer.profileImage}
+                        username={developer.nickname}
+                        role="Developer" // 현재 job_role을 내려주지 않아 ROLE_DEVELOPER로만 오므로 임시로 role을 직접 지정
+                        profileImage={
+                          developer.profileImageUrl ||
+                          '/icon/Profile_Default_img@2x.svg'
+                        }
                       />
                     ))}
                   </div>

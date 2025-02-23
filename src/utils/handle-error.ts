@@ -1,4 +1,4 @@
-import { ApiError, AUTH_ERROR_CODES } from '@/types/auth';
+import { ApiError, AUTH_ERROR_CODES, USER_ERROR_CODES } from '@/types/auth';
 import { MEDIA_ERROR_CODES } from '@/types/blog';
 import { POST_ERROR_CODES } from '@/types/blog';
 
@@ -101,5 +101,17 @@ export const getPostErrorMessage = (error: ApiError): string => {
 
     default:
       return error.message || '게시글 작성에 실패했습니다.';
+  }
+};
+
+// 사용자 관련 에러 처리
+export const getUserErrorMessage = (error: ApiError): string => {
+  switch (error.code) {
+    case USER_ERROR_CODES.FETCH_FAILED:
+      return '사용자 정보를 가져오는데 실패했습니다.';
+    case USER_ERROR_CODES.INVALID_ROLE:
+      return '잘못된 역할입니다.';
+    default:
+      return error.message;
   }
 };

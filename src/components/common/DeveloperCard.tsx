@@ -27,8 +27,8 @@ export default function DeveloperCard({
         <ProfileImage username={username} />
       )}
       <div>
-        <h3 className="font-medium text-gray-900">{username}</h3>
-        <p className="text-sm text-gray-500">{role}</p>
+        <h3 className="font-medium text-base text-[#000000]">{username}</h3>
+        <p className="text-base text-[#999999]">{role}</p>
       </div>
     </Link>
   );

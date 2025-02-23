@@ -48,7 +48,7 @@ export default function BlogPostCard({ post }: BlogPostCardProps) {
           {post.tags?.map((tag) => (
             <span
               key={tag.id}
-              className="px-4 py-2 bg-[#F2F3F5] text-[#666666] rounded-full text-sm"
+              className="px-4 py-2 bg-[#E4E6EB] text-[#666666] rounded-full text-sm"
             >
               {tag.title}
             </span>

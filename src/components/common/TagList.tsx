@@ -1,20 +1,31 @@
+'use client';
+
 import React from 'react';
-import { Tag } from '@/types/blog';
+import { Tag as TagType } from '@/types/blog';
+import Tag from './Tag';
 
 interface TagListProps {
-  tags: Tag[];
+  tags: TagType[];
+  onTagClick?: (tag: TagType) => void;
+  selectedTags?: TagType[];
 }
 
-export default function TagList({ tags }: TagListProps) {
+export default function TagList({
+  tags,
+  onTagClick,
+  selectedTags = [],
+}: TagListProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {tags?.map((tag) => (
-        <span
+        <Tag
           key={tag.id}
-          className="px-3 py-1 text-sm font-medium bg-gray-100 text-gray2 rounded-full"
-        >
-          {tag.title}
-        </span>
+          tag={tag}
+          onClick={onTagClick}
+          isSelected={selectedTags.some(
+            (selectedTag) => selectedTag.id === tag.id,
+          )}
+        />
       ))}
     </div>
   );

@@ -43,14 +43,13 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* 오른쪽 영역 (Developers 섹션과 동일한 width) */}
+        {/* 오른쪽 영역 */}
         <div className="w-[29%] flex justify-end">
           <div className="flex items-center gap-4">
-            {/* 글쓰기 버튼은 로그인 상태일 때만 표시하고 /write로 이동 */}
             {auth.isLoggedIn && (
               <Link
                 href="/write"
-                className="p-2 rounded-full hover:bg-[#000000] hover:bg-opacity-40 transition-all"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
               >
                 <Image
                   src="/icon/Edit.svg"
@@ -64,34 +63,17 @@ export default function Header() {
             {auth.isLoggedIn ? (
               <div className="relative">
                 <button
-                  className="w-8 h-8 rounded-full overflow-hidden group transition-all"
+                  className="w-8 h-8 rounded-full overflow-hidden hover:bg-black hover:bg-opacity-40 transition-all"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <div className="w-full h-full">
-                    {auth.userInfo?.profileImage ? (
-                      <img
-                        src={auth.userInfo.profileImage}
-                        alt="프로필"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full bg-gray-100 group-hover:bg-[#000000] group-hover:bg-opacity-40">
-                        <Image
-                          src="/icon/User.svg"
-                          alt="프로필"
-                          width={24}
-                          height={24}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  <ProfileImage src={auth.userInfo?.profileImage} size={32} />
                 </button>
                 {isDropdownOpen && <ProfileDropdown onLogout={handleLogout} />}
               </div>
             ) : (
               <Link
                 href="/login"
-                className="p-2 rounded-full hover:bg-black/40 transition-all"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
               >
                 <Image
                   src="/icon/Login.svg"

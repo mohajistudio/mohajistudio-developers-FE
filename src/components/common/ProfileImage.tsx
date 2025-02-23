@@ -1,36 +1,38 @@
+import Image from 'next/image';
+
 interface ProfileImageProps {
-  nickname?: string;
+  src?: string | null;
+  alt?: string;
   size?: number;
+  className?: string;
 }
 
 export default function ProfileImage({
-  nickname = 'Anonymous',
-  size = 40,
+  src,
+  alt = '프로필',
+  size = 32,
+  className = '',
 }: ProfileImageProps) {
-  const colorMap = [
-    'bg-red-500',
-    'bg-blue-500',
-    'bg-green-500',
-    'bg-yellow-500',
-    'bg-purple-500',
-    'bg-pink-500',
-    'bg-indigo-500',
-  ];
-
-  // 사용자 이름을 기반으로 일관된 색상 선택
-  const colorIndex =
-    nickname.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
-    colorMap.length;
-
   return (
-    <div
-      className={`relative rounded-full overflow-hidden ${colorMap[colorIndex]}`}
-      style={{ width: size, height: size }}
-    >
-      {/* 프로필 이미지가 있는 경우 */}
-      <div className="flex items-center justify-center w-full h-full text-white font-bold">
-        {nickname.charAt(0).toUpperCase()}
-      </div>
+    <div className={`relative group ${className}`}>
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          width={size}
+          height={size}
+          className="w-full h-full object-cover rounded-full"
+        />
+      ) : (
+        <Image
+          src="/icon/Profile_Default_img@2x.svg"
+          alt={alt}
+          width={size}
+          height={size}
+          className="w-full h-full object-cover rounded-full"
+        />
+      )}
+      <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 transition-opacity duration-200 rounded-full" />
     </div>
   );
 }

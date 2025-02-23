@@ -10,51 +10,49 @@ interface BlogPostCardProps {
 
 export default function BlogPostCard({ post }: BlogPostCardProps) {
   return (
-    <article className="bg-white rounded-2xl overflow-hidden shadow-sm">
-      {/* 썸네일 이미지 */}
-      {post.thumbnail && (
-        <div className="relative w-full h-[400px]">
-          <Image
-            src={post.thumbnail}
-            alt={post.title}
-            fill
-            className="object-cover"
-            priority
-          />
+    <Link href={`/posts/${post.id}`}>
+      <article className="bg-white rounded-2xl overflow-hidden shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] hover:bg-[#F7F8FA] transition-colors">
+        {/* 썸네일 이미지 */}
+        {post.thumbnail && (
+          <div className="relative w-full h-[400px]">
+            <Image
+              src={post.thumbnail}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        )}
+
+        {/* 컨텐츠 영역 */}
+        <div className="p-8">
+          {/* 제목 */}
+          <h2 className="text-2xl font-bold mb-2">{post.title}</h2>
+
+          {/* 날짜 */}
+          <time className="block text-[#666666] mb-4">
+            {post.publishedAt
+              ? formatDate(post.publishedAt)
+              : formatDate(post.createdAt)}
+          </time>
+
+          {/* 요약 */}
+          <p className="text-[#4D4D4D] mb-6">{post.summary}</p>
+
+          {/* 태그 목록 */}
+          <div className="flex flex-wrap gap-2">
+            {post.tags?.map((tag) => (
+              <span
+                key={tag.id}
+                className="px-4 py-2 bg-[#E4E6EB] text-[#666666] rounded-full text-sm"
+              >
+                {tag.title}
+              </span>
+            ))}
+          </div>
         </div>
-      )}
-
-      {/* 컨텐츠 영역 */}
-      <div className="p-8">
-        {/* 제목 */}
-        <Link href={`/posts/${post.id}`}>
-          <h2 className="text-2xl font-bold mb-2 hover:text-[#FF8C42] transition-colors">
-            {post.title}
-          </h2>
-        </Link>
-
-        {/* 날짜 */}
-        <time className="block text-[#666666] mb-4">
-          {post.publishedAt
-            ? formatDate(post.publishedAt)
-            : formatDate(post.createdAt)}
-        </time>
-
-        {/* 요약 */}
-        <p className="text-[#4D4D4D] mb-6">{post.summary}</p>
-
-        {/* 태그 목록 */}
-        <div className="flex flex-wrap gap-2">
-          {post.tags?.map((tag) => (
-            <span
-              key={tag.id}
-              className="px-4 py-2 bg-[#E4E6EB] text-[#666666] rounded-full text-sm"
-            >
-              {tag.title}
-            </span>
-          ))}
-        </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }

@@ -147,3 +147,21 @@ export const POST_ERROR_CODES = {
   // 기타 에러
   UNKNOWN_ERROR: 'P999',
 } as const;
+
+export interface Contact {
+  id: string;
+  name: string;
+  imageUrl: string;
+  displayName: string;
+  url: string;
+}
+
+export interface UserDetail {
+  id: string;
+  nickname: string;
+  email: string;
+  profileImageUrl: string;
+  bio: string;
+  role: string;
+  contacts: Contact[];
+}

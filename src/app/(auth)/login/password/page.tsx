@@ -10,7 +10,7 @@ import { getAuthErrorMessage } from '@/utils/handle-error';
 import type { ApiError } from '@/types/auth';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
-import { authState } from '@/store/auth';
+import { authState, initializeAuthState } from '@/store/auth';
 
 export default function LoginPasswordPage() {
   const router = useRouter();
@@ -37,23 +37,12 @@ export default function LoginPasswordPage() {
     try {
       const response = await login({ email, password });
 
-      // 토큰 저장 시 Bearer 접두사 없이 저장
+      // 토큰 저장
       localStorage.setItem('accessToken', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
 
-      // 저장된 토큰 확인
-      console.log('Stored tokens:', {
-        accessToken: localStorage.getItem('accessToken'),
-        refreshToken: localStorage.getItem('refreshToken'),
-      });
-
-      // Recoil 상태 업데이트
-      setAuth({
-        isLoggedIn: true,
-        userInfo: {
-          profileImage: '', // 외부 이미지 URL 대신 빈 문자열로 설정
-        },
-      });
+      // auth 상태 업데이트 - initializeAuthState 사용
+      initializeAuthState(setAuth, response.accessToken);
 
       // 임시 데이터 삭제
       localStorage.removeItem('tempEmail');

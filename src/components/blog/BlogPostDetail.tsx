@@ -112,7 +112,7 @@ export default function BlogPostDetail({
               )}
 
               {/* 본문 내용 */}
-              <div className="prose max-w-none">
+              <div className="prose max-w-none bg-white">
                 <MarkdownPreview content={post.content} />
               </div>
 

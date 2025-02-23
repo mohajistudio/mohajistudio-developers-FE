@@ -168,7 +168,9 @@ const MarkdownPreview = ({
   };
 
   return (
-    <div className="h-full bg-surface1 overflow-y-auto px-8 py-6">
+    <div
+      className={`h-full overflow-y-auto px-8 py-6 ${isPreview ? 'bg-surface1' : 'bg-white'}`}
+    >
       {/* 프리뷰 모드일 때만 제목 표시 */}
       {isPreview && (
         <h1 className="text-[30px] font-bold mb-8 text-black">

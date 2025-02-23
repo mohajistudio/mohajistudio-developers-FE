@@ -10,7 +10,7 @@ import type { ApiError } from '@/types/auth';
 import { AUTH_ERROR_CODES } from '@/types/auth';
 import { setNickname } from '@/apis/auth/register';
 import { useRecoilState } from 'recoil';
-import { authState } from '@/store/auth';
+import { authState, initializeAuthState } from '@/store/auth';
 
 export default function SetNickNamePage() {
   const router = useRouter();
@@ -54,13 +54,10 @@ export default function SetNickNamePage() {
       // 회원가입 완료 후 필요없는 임시 데이터 삭제
       localStorage.removeItem('tempEmail');
 
-      // Recoil 상태 업데이트 추가
-      setAuth({
-        isLoggedIn: true,
-        userInfo: {
-          profileImage: '',
-        },
-      });
+      // auth 상태 업데이트 - initializeAuthState 사용
+      if (token) {
+        initializeAuthState(setAuth, token);
+      }
 
       // 로그인 페이지 대신 홈으로 직접 이동
       router.push('/');

@@ -1,3 +1,5 @@
+import { JwtPayload } from 'jwt-decode';
+
 export interface EmailVerificationRequest {
   email: string;
 }
@@ -42,6 +44,18 @@ export interface LoginResponse {
 
 export interface EmailVerificationRequestResponse {
   expiredAt: string;
+}
+
+export interface CustomJwtPayload extends JwtPayload {
+  iat: number;
+  iss: string;
+  exp: number;
+  user: {
+    sub: string;
+    email: string;
+    role: string;
+    nickname: string;
+  };
 }
 
 {

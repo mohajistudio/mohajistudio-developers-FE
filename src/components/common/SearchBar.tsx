@@ -22,7 +22,7 @@ export default function SearchBar() {
   }, [searchQuery, searchParams, router]);
 
   return (
-    <section className="w-[71%] max-md:w-full">
+    <section>
       {/* Search 타이틀 */}
       <div className="flex items-center gap-2 mb-3">
         <Image src="/icon/Search.svg" alt="검색" width={24} height={24} />

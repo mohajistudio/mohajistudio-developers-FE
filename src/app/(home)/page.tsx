@@ -2,10 +2,13 @@ import { getPostsServer } from '@/apis/posts';
 import SearchBar from '@/components/common/SearchBar';
 import TagList from '@/components/common/TagList';
 import PostListClient from '@/components/blog/PostListClient';
-import { mockTags } from '@/mocks/tags';
 import Image from 'next/image';
 import DeveloperCard from '@/components/common/DeveloperCard';
 import { getDevelopers } from '@/apis/users';
+import { getTags } from '@/apis/tags';
+import type { User, Post, Tag } from '@/types/blog';
+import type { PaginatedResponse } from '@/types/blog';
+import TagListContainer from '@/components/common/TagListContainer';
 
 export default async function HomePage({
   searchParams,
@@ -13,7 +16,7 @@ export default async function HomePage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // 초기 데이터 서버에서 페칭
-  const [initialData, developers] = await Promise.allSettled([
+  const [postsResult, developersResult, tagsResult] = await Promise.allSettled([
     getPostsServer({
       page: 0,
       size: 20,
@@ -25,7 +28,10 @@ export default async function HomePage({
           : undefined,
     }),
     getDevelopers(),
-  ]).then(([postsResult, developersResult]) => [
+    getTags(),
+  ]);
+
+  const initialData =
     postsResult.status === 'fulfilled'
       ? postsResult.value
       : {
@@ -35,9 +41,12 @@ export default async function HomePage({
           totalElements: 0,
           totalPages: 0,
           last: true,
-        },
-    developersResult.status === 'fulfilled' ? developersResult.value : [],
-  ]);
+        };
+
+  const developers =
+    developersResult.status === 'fulfilled' ? developersResult.value : [];
+
+  const tags = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
 
   return (
     <div className="flex overflow-hidden flex-col items-center px-20 pt-9 pb-40 max-md:px-5 max-md:pt-9 max-md:pb-24 max-sm:p-5">
@@ -60,7 +69,7 @@ export default async function HomePage({
                       />
                       <div>Tags</div>
                     </div>
-                    <TagList tags={mockTags} />
+                    <TagListContainer tags={tags} />
                   </div>
 
                   {/* 게시글 목록 섹션 */}

@@ -9,6 +9,8 @@ import { getAuthErrorMessage } from '@/utils/handle-error';
 import type { ApiError } from '@/types/auth';
 import { AUTH_ERROR_CODES } from '@/types/auth';
 import { setNickname } from '@/apis/auth/register';
+import { useRecoilState } from 'recoil';
+import { authState } from '@/store/auth';
 
 export default function SetNickNamePage() {
   const router = useRouter();
@@ -16,6 +18,7 @@ export default function SetNickNamePage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [auth, setAuth] = useRecoilState(authState);
 
   // 초기 로딩 시 토큰과 이메일 체크
   useEffect(() => {
@@ -51,8 +54,16 @@ export default function SetNickNamePage() {
       // 회원가입 완료 후 필요없는 임시 데이터 삭제
       localStorage.removeItem('tempEmail');
 
-      // 홈 페이지로 이동
-      router.push('/login');
+      // Recoil 상태 업데이트 추가
+      setAuth({
+        isLoggedIn: true,
+        userInfo: {
+          profileImage: '',
+        },
+      });
+
+      // 로그인 페이지 대신 홈으로 직접 이동
+      router.push('/');
     } catch (error) {
       // console.error('[닉네임 설정 에러]', error);
 

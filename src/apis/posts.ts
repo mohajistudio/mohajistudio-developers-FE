@@ -13,7 +13,6 @@ export interface UploadedFile {
   updatedAt: string;
   userId: string;
   fileName: string;
-  originalFileName: string;
   contentType: string;
   size: number;
 }
@@ -67,7 +66,7 @@ export const uploadMediaFiles = async (
     });
 
     const response = await multipartInstance.post<UploadedFile[]>(
-      '/posts/media',
+      '/media-files',
       formData,
     );
     return response.data;

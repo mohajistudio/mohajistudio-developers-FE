@@ -192,3 +192,12 @@ multipartInstance.interceptors.response.use(
   (response) => response,
   responseInterceptor,
 );
+
+// 인터셉터 설정
+multipartInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});

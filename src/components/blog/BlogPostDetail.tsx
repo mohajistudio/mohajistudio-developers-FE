@@ -73,7 +73,7 @@ export default function BlogPostDetail({
         <div className="flex gap-5">
           {/* 게시글 영역 */}
           <div className="flex-[0.84]">
-            <article className="bg-white rounded-2xl shadow-sm p-16">
+            <article className="bg-white rounded-2xl shadow-sm p-16 w-[922px] overflow-hidden">
               <header className="mb-6">
                 <h1 className="text-[30px] font-bold text-black mb-2">
                   {post.title}

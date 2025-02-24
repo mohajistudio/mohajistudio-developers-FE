@@ -266,6 +266,7 @@ const MarkdownPreview = ({
         .code-block-content {
           background: #ffffff;
           overflow-x: auto;
+          max-width: 790px; /* 922px(article width) - 64px(좌우패딩) - 68px(코드블록 좌우마진) */
         }
 
         .code-block-content > div {
@@ -296,6 +297,8 @@ const MarkdownPreview = ({
           -moz-tab-size: 2 !important;
           -o-tab-size: 2 !important;
           -webkit-tab-size: 2 !important;
+          width: max-content;
+          min-width: 100%;
         }
 
         .code-block-content code {
@@ -314,6 +317,26 @@ const MarkdownPreview = ({
           text-align: right !important;
           color: #999999 !important;
           user-select: none !important;
+        }
+
+        /* 스크롤바 커스텀 스타일링 */
+        .code-block-content::-webkit-scrollbar {
+          height: 6px; /* 가로 스크롤바 높이 */
+        }
+
+        .code-block-content::-webkit-scrollbar-track {
+          background: #f2f3f5; /* 배경색 - 디자인 시스템의 Bg 색상 */
+          border-radius: 3px; /* 트랙 모서리 둥글게 */
+        }
+
+        .code-block-content::-webkit-scrollbar-thumb {
+          background: #e4e6eb; /* 스크롤바 색상 - 디자인 시스템의 Bg2 색상 */
+          border-radius: 3px; /* 스크롤바 모서리 둥글게 */
+          transition: background-color 0.2s ease; /* 호버 효과 부드럽게 */
+        }
+
+        .code-block-content::-webkit-scrollbar-thumb:hover {
+          background: #999999; /* 호버 시 색상 - 디자인 시스템의 Gray3 색상 */
         }
       `}</style>
     </div>

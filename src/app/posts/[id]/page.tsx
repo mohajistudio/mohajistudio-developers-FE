@@ -29,6 +29,41 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // 현재 활성화된 헤딩 업데이트 함수 (TableOfContents에 활성화 ID 전달)
+  const [activeHeadingId, setActiveHeadingId] = useState<string>('');
+
+  // 헤딩 요소 감시를 위한 IntersectionObserver 설정
+  useEffect(() => {
+    if (tocItems.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // 화면에 보이는 헤딩 중 첫 번째 것을 활성 헤딩으로 설정
+        const visibleHeadings = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => entry.target.id);
+
+        if (visibleHeadings.length > 0) {
+          setActiveHeadingId(visibleHeadings[0]);
+        }
+      },
+      {
+        rootMargin: '-20% 0% -35% 0%', // 상단 20%, 하단 35% 영역은 무시
+        threshold: 0.1, // 요소의 10%가 보이면 감지
+      },
+    );
+
+    // 모든 헤딩 요소를 관찰
+    tocItems.forEach((item) => {
+      const element = document.getElementById(item.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [tocItems]);
+
   // Top 버튼 클릭 핸들러
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -38,14 +73,15 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     const fetchPost = async () => {
       try {
         const data = await getPost(params.id);
-        console.log('서버에서 받아온 원본 content:', data.content); // 여기 추가
+        console.log('서버에서 받아온 원본 content:', data.content);
 
         // 마크다운 정규화 적용
         const formattedContent = normalizeMarkdown(data.content);
-        console.log('정규화 후 content:', formattedContent); // 여기 추가
+        console.log('정규화 후 content:', formattedContent);
 
         // 목차 아이템 추출
         const items = extractTocItems(formattedContent);
+        console.log('추출된 TOC 항목:', items);
 
         setTocItems(items);
         setPost({
@@ -137,6 +173,7 @@ export default function PostDetail({ params }: { params: { id: string } }) {
                 <MarkdownPreview
                   content={post.content}
                   title="" // 제목은 이미 상단에 표시되어 있으므로 빈 문자열
+                  tocItems={tocItems} // TOC 항목 전달
                 />
               </div>
 
@@ -155,7 +192,7 @@ export default function PostDetail({ params }: { params: { id: string } }) {
 
           {/* 사이드바 영역 */}
           <div className="flex-[0.16]">
-            <TableOfContents items={tocItems} />
+            <TableOfContents items={tocItems} activeId={activeHeadingId} />
           </div>
         </div>
       </div>

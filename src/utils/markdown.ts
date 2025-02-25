@@ -1,3 +1,5 @@
+import { TocItem } from '@/types/blog';
+
 /**
  * 마크다운 텍스트를 정규화하는 함수
  */
@@ -37,19 +39,66 @@ export const normalizeMarkdown = (content: string): string => {
 };
 
 /**
- * 마크다운에서 목차 아이템을 추출하는 함수
+ * 텍스트를 URL-friendly한 슬러그로 변환하는 함수
+ */
+export const slugify = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-') // 공백을 하이픈으로 변환
+    .replace(/[^\w\-]+/g, '') // 알파벳, 숫자, 하이픈이 아닌 문자 제거
+    .replace(/\-\-+/g, '-') // 연속된 하이픈을 하나로 합침
+    .replace(/^-+/, '') // 앞쪽 하이픈 제거
+    .replace(/-+$/, ''); // 뒤쪽 하이픈 제거
+};
+
+/**
+ * 마크다운에서 목차 아이템을 추출하는 향상된 함수
  */
 export const extractTocItems = (content: string) => {
-  const headings = content.match(/#{1,6}\s+[^\n]+/g) || [];
+  // 헤딩을 추출하는 정규식 (# 헤딩, ## 헤딩, ### 헤딩 형식으로 추출)
+  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
+  const items = [];
+  let match;
 
-  return headings.map((heading, index) => {
-    const level = (heading.match(/^#+/) || [''])[0].length;
-    const text = heading.replace(/^#+\s+/, '').trim();
+  // 모든 헤딩을 찾아 목차 항목으로 변환
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length; // #의 개수
+    const text = match[2].trim();
 
-    return {
-      id: `heading-${index}`,
+    // 고유한 ID 생성 - ID 형식을 일관되게 유지 (기존 코드와 호환)
+    const id = `heading-${items.length}`;
+
+    items.push({
+      id,
       text,
       level,
-    };
+    });
+  }
+
+  return items;
+};
+
+/**
+ * TOC ID를 마크다운 텍스트에 삽입하는 함수
+ * 추출된 목차 항목에 맞게 마크다운의 헤딩에 ID를 추가
+ */
+export const insertTocIdsToMarkdown = (
+  markdownText: string,
+  tocItems: TocItem[],
+): string => {
+  let result = markdownText;
+  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
+  let index = 0;
+
+  // 마크다운의 각 헤딩을 찾아 ID 속성을 추가
+  result = result.replace(headingRegex, (match, hashes, content) => {
+    if (index < tocItems.length) {
+      const tocItem = tocItems[index++];
+      // 마크다운 헤딩에 ID 추가 (HTML 속성 형태로)
+      return `${hashes} ${content} {#${tocItem.id}}`;
+    }
+    return match;
   });
+
+  return result;
 };

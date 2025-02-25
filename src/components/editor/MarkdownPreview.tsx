@@ -1,6 +1,6 @@
-// src/components/editor/MarkdownPreview.tsx
 'use client';
 
+import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -8,12 +8,13 @@ import rehypeSanitize from 'rehype-sanitize';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Components } from 'react-markdown';
-import type { ElementType } from 'react';
+import { TocItem } from '@/types/blog';
 
 interface MarkdownPreviewProps {
   content: string;
   isPreview?: boolean; // 프리뷰 모드인지 여부
   title?: string; // 프리뷰일 때만 사용
+  tocItems?: TocItem[]; // TOC 아이템 목록
 }
 
 // 커스텀 테마 설정
@@ -41,18 +42,41 @@ const customTheme = {
   'token.constant': { ...oneLight['token.constant'], background: 'none' },
 };
 
-// CodeComponent 타입 정의
-type CodeComponentProps = Components['code'] & {
-  inline?: boolean;
-};
-
 const MarkdownPreview = ({
   content,
   isPreview = false,
   title,
+  tocItems = [],
 }: MarkdownPreviewProps) => {
-  // CodeComponent를 직접 Components['code']로 타입 지정하지 않고
-  // ReactMarkdown의 components prop에서 타입을 추론하도록 함
+  // 디버깅을 위한 로그
+  useEffect(() => {
+    console.log('MarkdownPreview 마운트, tocItems:', tocItems);
+
+    // 마운트 후 잠시 대기 후 헤딩 ID 확인 (렌더링 완료 후)
+    setTimeout(() => {
+      const headings = document.querySelectorAll('h1, h2, h3');
+      console.log('렌더링된 헤딩 요소 수:', headings.length);
+      console.log('헤딩 요소:');
+      headings.forEach((h) => {
+        console.log(
+          `${h.tagName}: id="${h.id}", text="${h.textContent?.trim()}"`,
+        );
+      });
+
+      // TOC에서 사용하는 ID를 가진 요소가 있는지 확인
+      if (tocItems.length > 0) {
+        console.log('TOC 항목에 대응하는 헤딩 요소 확인:');
+        tocItems.forEach((item) => {
+          const element = document.getElementById(item.id);
+          console.log(
+            `TOC ID "${item.id}" (${item.text}): ${element ? '요소 찾음' : '요소 없음'}`,
+          );
+        });
+      }
+    }, 500);
+  }, [tocItems]);
+
+  // CodeComponent를 위한 정의 (이전과 동일)
   const CodeComponent = ({
     node,
     inline,
@@ -111,6 +135,43 @@ const MarkdownPreview = ({
     );
   };
 
+  // 헤딩 처리를 위한 함수 - TOC 항목의 ID를 그대로 사용
+  const createHeadingComponent = (level: number) => {
+    return ({ node, children, ...props }: any) => {
+      // 헤딩 텍스트 얻기
+      const text = String(children).replace(/\s+/g, ' ').trim();
+
+      // 해당 텍스트를 가진 TOC 항목 찾기
+      const matchingTocItem = tocItems.find(
+        (item) => item.level === level && item.text === text,
+      );
+
+      // TOC에 있는 항목인 경우 해당 ID 사용, 없으면 자체 ID 생성
+      const id = matchingTocItem
+        ? matchingTocItem.id
+        : `heading-auto-${level}-${text.slice(0, 20).toLowerCase().replace(/\s+/g, '-')}`;
+
+      console.log(`헤딩 렌더링: level=${level}, text="${text}", id="${id}"`);
+
+      let className;
+      if (level === 1) {
+        className = 'text-[30px] font-bold text-black mt-8 mb-4';
+      } else if (level === 2) {
+        className = 'text-[24px] font-bold text-black mt-6 mb-4';
+      } else if (level === 3) {
+        className = 'text-[20px] font-bold text-black mt-5 mb-3';
+      }
+
+      const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
+
+      return (
+        <HeadingTag id={id} className={className} {...props}>
+          {children}
+        </HeadingTag>
+      );
+    };
+  };
+
   const components: Components = {
     code: CodeComponent,
     a: ({ node, children, href, ...props }) => (
@@ -124,21 +185,9 @@ const MarkdownPreview = ({
         {children}
       </a>
     ),
-    h1: ({ node, children, ...props }) => (
-      <h1 className="text-[30px] font-bold text-black mt-8 mb-4" {...props}>
-        {children}
-      </h1>
-    ),
-    h2: ({ node, children, ...props }) => (
-      <h2 className="text-[24px] font-bold text-black mt-6 mb-4" {...props}>
-        {children}
-      </h2>
-    ),
-    h3: ({ node, children, ...props }) => (
-      <h3 className="text-[20px] font-bold text-black mt-5 mb-3" {...props}>
-        {children}
-      </h3>
-    ),
+    h1: createHeadingComponent(1),
+    h2: createHeadingComponent(2),
+    h3: createHeadingComponent(3),
     p: ({ node, children, ...props }) => (
       <p
         className="text-[16px] leading-7 text-[#4D4D4D] mb-4 whitespace-pre-line"
@@ -188,6 +237,7 @@ const MarkdownPreview = ({
       </div>
 
       <style jsx global>{`
+        /* 기존 스타일 동일하게 유지 */
         .code-block-wrapper {
           margin: 1.5em 0;
           background: #ffffff;
@@ -230,11 +280,10 @@ const MarkdownPreview = ({
         }
 
         .language-label {
-          /* 중앙 정렬 스타일 제거 */
           position: absolute;
-          left: auto; /* left: 50% 제거 */
-          right: 12px; /* 우측 끝에서 12px 간격 */
-          transform: translateY(-50%); /* X축 변환 제거, Y축만 유지 */
+          left: auto;
+          right: 12px;
+          transform: translateY(-50%);
           top: 50%;
           font-size: 12px;
           color: #666666;
@@ -266,7 +315,7 @@ const MarkdownPreview = ({
         .code-block-content {
           background: #ffffff;
           overflow-x: auto;
-          max-width: 790px; /* 922px(article width) - 64px(좌우패딩) - 68px(코드블록 좌우마진) */
+          max-width: 790px;
         }
 
         .code-block-content > div {
@@ -321,22 +370,22 @@ const MarkdownPreview = ({
 
         /* 스크롤바 커스텀 스타일링 */
         .code-block-content::-webkit-scrollbar {
-          height: 6px; /* 가로 스크롤바 높이 */
+          height: 6px;
         }
 
         .code-block-content::-webkit-scrollbar-track {
-          background: #f2f3f5; /* 배경색 - 디자인 시스템의 Bg 색상 */
-          border-radius: 3px; /* 트랙 모서리 둥글게 */
+          background: #f2f3f5;
+          border-radius: 3px;
         }
 
         .code-block-content::-webkit-scrollbar-thumb {
-          background: #e4e6eb; /* 스크롤바 색상 - 디자인 시스템의 Bg2 색상 */
-          border-radius: 3px; /* 스크롤바 모서리 둥글게 */
-          transition: background-color 0.2s ease; /* 호버 효과 부드럽게 */
+          background: #e4e6eb;
+          border-radius: 3px;
+          transition: background-color 0.2s ease;
         }
 
         .code-block-content::-webkit-scrollbar-thumb:hover {
-          background: #999999; /* 호버 시 색상 - 디자인 시스템의 Gray3 색상 */
+          background: #999999;
         }
       `}</style>
     </div>

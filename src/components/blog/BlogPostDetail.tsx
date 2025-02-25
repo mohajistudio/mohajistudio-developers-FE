@@ -1,28 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Post, TocItem } from '@/types/blog';
 import { formatDate } from '@/utils/date';
-import TableOfContents from '@/app/posts/[id]/TableOfContents';
+import { normalizeMarkdown, extractTocItems } from '@/utils/markdown';
 import TagList from '@/components/common/TagList';
 import ProfileImage from '@/components/common/ProfileImage';
+import { getPost } from '@/apis/posts';
 import { ArrowUp } from 'lucide-react';
 import MarkdownPreview from '@/components/editor/MarkdownPreview';
+import TableOfContents from '@/app/posts/[id]/TableOfContents';
 
-interface BlogPostDetailProps {
-  post: Post;
-  tocItems: TocItem[];
-  onBack: () => void;
-  onShare: () => void;
-}
-
-export default function BlogPostDetail({
-  post,
-  tocItems,
-  onBack,
-  onShare,
-}: BlogPostDetailProps) {
+export default function PostDetail({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const [post, setPost] = useState<Post | null>(null);
+  const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [showTopButton, setShowTopButton] = useState(false);
 
   // 스크롤 위치에 따라 Top 버튼 표시 여부 결정
@@ -40,7 +34,35 @@ export default function BlogPostDetail({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const normalizedContent = post.content.replace(/<[^>]+>/g, '');
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const data = await getPost(params.id);
+        console.log('서버에서 받아온 원본 content:', data.content);
+
+        // 마크다운 정규화 적용
+        const formattedContent = normalizeMarkdown(data.content);
+        console.log('정규화 후 content:', formattedContent);
+
+        // 목차 아이템 추출
+        const items = extractTocItems(formattedContent);
+        console.log('추출된 TOC 항목:', items);
+
+        setTocItems(items);
+        setPost({
+          ...data,
+          content: formattedContent,
+        });
+      } catch (error) {
+        console.error('게시글을 불러오는데 실패했습니다:', error);
+        router.push('/');
+      }
+    };
+
+    fetchPost();
+  }, [params.id, router]);
+
+  if (!post) return null;
 
   return (
     <div className="flex flex-col items-center px-20 pt-9 pb-36 bg-[#F2F3F5] relative">
@@ -48,7 +70,7 @@ export default function BlogPostDetail({
         {/* 상단 네비게이션 */}
         <div className="flex justify-between items-center mb-4">
           <button
-            onClick={onBack}
+            onClick={() => router.back()}
             className="flex items-center gap-2 text-black font-bold"
           >
             <svg
@@ -73,7 +95,7 @@ export default function BlogPostDetail({
         <div className="flex gap-5">
           {/* 게시글 영역 */}
           <div className="flex-[0.84]">
-            <article className="bg-white rounded-2xl shadow-sm p-16 w-[922px] overflow-hidden">
+            <article className="bg-white rounded-2xl shadow-sm p-16">
               <header className="mb-6">
                 <h1 className="text-[30px] font-bold text-black mb-2">
                   {post.title}
@@ -112,8 +134,12 @@ export default function BlogPostDetail({
               )}
 
               {/* 본문 내용 */}
-              <div className="prose max-w-none bg-white">
-                <MarkdownPreview content={post.content} />
+              <div className="prose prose-neutral max-w-none">
+                <MarkdownPreview
+                  content={post.content}
+                  title="" // 제목은 이미 상단에 표시되어 있으므로 빈 문자열
+                  tocItems={tocItems} // TOC 항목 전달
+                />
               </div>
 
               {/* Top 버튼 */}
@@ -129,7 +155,7 @@ export default function BlogPostDetail({
             </article>
           </div>
 
-          {/* 사이드바 영역 */}
+          {/* 사이드바 영역 - activeId 전달 제거 */}
           <div className="flex-[0.16]">
             <TableOfContents items={tocItems} />
           </div>

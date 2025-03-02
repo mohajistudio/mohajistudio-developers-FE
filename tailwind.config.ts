@@ -16,12 +16,13 @@ const config: Config = {
         // Background colors
         bg: '#F2F3F5',
         'bg-2': '#E4E6EB',
-        surface1: '#F9F9F9',
+        surface1: '#FCFCFC',
         surface2: '#FFFFFF',
+        'surface-hover': '#F7F8FA',
         // State colors
-        error: '#F73322',
-        warning: '#E73322',
-        success: '#3EC292',
+        error: '#F44336',
+        warning: '#FFC107',
+        success: '#4CAF50',
         'success-2': '#388E3C',
         info: '#2196F3',
         // Font colors

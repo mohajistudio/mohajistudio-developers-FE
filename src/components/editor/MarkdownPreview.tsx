@@ -9,6 +9,7 @@ import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Components } from 'react-markdown';
 import { TocItem } from '@/types/blog';
+import { MarkdownPreviewStyles } from './MarkdownPreviewStyles';
 
 interface MarkdownPreviewProps {
   content: string;
@@ -50,27 +51,27 @@ const MarkdownPreview = ({
 }: MarkdownPreviewProps) => {
   // 디버깅을 위한 로그
   useEffect(() => {
-    console.log('MarkdownPreview 마운트, tocItems:', tocItems);
+    // console.log('MarkdownPreview 마운트, tocItems:', tocItems);
 
     // 마운트 후 잠시 대기 후 헤딩 ID 확인 (렌더링 완료 후)
     setTimeout(() => {
       const headings = document.querySelectorAll('h1, h2, h3');
-      console.log('렌더링된 헤딩 요소 수:', headings.length);
-      console.log('헤딩 요소:');
+      // console.log('렌더링된 헤딩 요소 수:', headings.length);
+      // console.log('헤딩 요소:');
       headings.forEach((h) => {
-        console.log(
-          `${h.tagName}: id="${h.id}", text="${h.textContent?.trim()}"`,
-        );
+        // console.log(
+        //   `${h.tagName}: id="${h.id}", text="${h.textContent?.trim()}"`,
+        // );
       });
 
       // TOC에서 사용하는 ID를 가진 요소가 있는지 확인
       if (tocItems.length > 0) {
-        console.log('TOC 항목에 대응하는 헤딩 요소 확인:');
+        // console.log('TOC 항목에 대응하는 헤딩 요소 확인:');
         tocItems.forEach((item) => {
           const element = document.getElementById(item.id);
-          console.log(
-            `TOC ID "${item.id}" (${item.text}): ${element ? '요소 찾음' : '요소 없음'}`,
-          );
+          // console.log(
+          //   `TOC ID "${item.id}" (${item.text}): ${element ? '요소 찾음' : '요소 없음'}`,
+          // );
         });
       }
     }, 500);
@@ -137,7 +138,7 @@ const MarkdownPreview = ({
 
   // 헤딩 처리를 위한 함수 - TOC 항목의 ID를 그대로 사용
   const createHeadingComponent = (level: number) => {
-    return ({ node, children, ...props }: any) => {
+    const HeadingComponent = ({ node, children, ...props }: any) => {
       // 헤딩 텍스트 얻기
       const text = String(children).replace(/\s+/g, ' ').trim();
 
@@ -151,7 +152,7 @@ const MarkdownPreview = ({
         ? matchingTocItem.id
         : `heading-auto-${level}-${text.slice(0, 20).toLowerCase().replace(/\s+/g, '-')}`;
 
-      console.log(`헤딩 렌더링: level=${level}, text="${text}", id="${id}"`);
+      // console.log(`헤딩 렌더링: level=${level}, text="${text}", id="${id}"`);
 
       let className;
       if (level === 1) {
@@ -170,6 +171,10 @@ const MarkdownPreview = ({
         </HeadingTag>
       );
     };
+
+    HeadingComponent.displayName = `Heading${level}`;
+
+    return HeadingComponent;
   };
 
   const components: Components = {
@@ -218,7 +223,7 @@ const MarkdownPreview = ({
 
   return (
     <div
-      className={`h-full overflow-y-auto px-8 py-6 ${isPreview ? 'bg-surface1' : 'bg-white'}`}
+      className={`h-full overflow-y-auto px-8 py-6 ${isPreview ? 'bg-[#FCFCFC]' : 'bg-white'}`}
     >
       {/* 프리뷰 모드일 때만 제목 표시 */}
       {isPreview && (
@@ -236,158 +241,7 @@ const MarkdownPreview = ({
         </ReactMarkdown>
       </div>
 
-      <style jsx global>{`
-        /* 기존 스타일 동일하게 유지 */
-        .code-block-wrapper {
-          margin: 1.5em 0;
-          background: #ffffff;
-          border: 1px solid #e4e6eb;
-          border-radius: 8px;
-          overflow: hidden;
-        }
-
-        .code-block-header {
-          position: relative;
-          height: 32px;
-          background: #f9f9f9;
-          display: flex;
-          align-items: center;
-          padding: 0 12px;
-          border-bottom: 1px solid #e4e6eb;
-        }
-
-        .mac-buttons {
-          display: flex;
-          gap: 8px;
-        }
-
-        .mac-button {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-        }
-
-        .mac-button.close {
-          background-color: #ff5f56;
-        }
-
-        .mac-button.minimize {
-          background-color: #ffbd2e;
-        }
-
-        .mac-button.maximize {
-          background-color: #27c93f;
-        }
-
-        .language-label {
-          position: absolute;
-          left: auto;
-          right: 12px;
-          transform: translateY(-50%);
-          top: 50%;
-          font-size: 12px;
-          color: #666666;
-          font-weight: 500;
-        }
-
-        /* prose 스타일 재정의 */
-        .prose {
-          max-width: none;
-        }
-
-        .prose pre {
-          margin: 0 !important;
-          padding: 0 !important;
-          background: transparent !important;
-        }
-
-        .prose img {
-          border-radius: 8px;
-          margin: 24px 0;
-        }
-
-        .prose hr {
-          border-color: #e4e6eb;
-          margin: 24px 0;
-        }
-
-        /* 코드 블록 내부 스타일 */
-        .code-block-content {
-          background: #ffffff;
-          overflow-x: auto;
-          max-width: 790px;
-        }
-
-        .code-block-content > div {
-          background: #ffffff !important;
-        }
-
-        .code-block-content code {
-          background: none !important;
-        }
-
-        .code-block-content span {
-          background: none !important;
-        }
-
-        /* 인라인 코드 스타일 */
-        :not(pre) > code {
-          background-color: #f2f3f5 !important;
-          color: #666666 !important;
-          padding: 0.2em 0.4em !important;
-          border-radius: 4px !important;
-          font-size: 14px !important;
-          font-family: Pretendard !important;
-        }
-
-        /* 코드 블록 들여쓰기 관련 스타일 추가 */
-        .code-block-content pre {
-          tab-size: 2 !important;
-          -moz-tab-size: 2 !important;
-          -o-tab-size: 2 !important;
-          -webkit-tab-size: 2 !important;
-          width: max-content;
-          min-width: 100%;
-        }
-
-        .code-block-content code {
-          font-family: 'Pretendard Mono', Consolas, Monaco, monospace !important;
-          white-space: pre !important;
-          word-spacing: normal !important;
-          word-break: normal !important;
-          word-wrap: normal !important;
-          line-height: 1.5 !important;
-        }
-
-        /* 라인 넘버 스타일 */
-        .linenumber {
-          min-width: 2.5em !important;
-          padding-right: 1em !important;
-          text-align: right !important;
-          color: #999999 !important;
-          user-select: none !important;
-        }
-
-        /* 스크롤바 커스텀 스타일링 */
-        .code-block-content::-webkit-scrollbar {
-          height: 6px;
-        }
-
-        .code-block-content::-webkit-scrollbar-track {
-          background: #f2f3f5;
-          border-radius: 3px;
-        }
-
-        .code-block-content::-webkit-scrollbar-thumb {
-          background: #e4e6eb;
-          border-radius: 3px;
-          transition: background-color 0.2s ease;
-        }
-
-        .code-block-content::-webkit-scrollbar-thumb:hover {
-          background: #999999;
-        }
-      `}</style>
+      <MarkdownPreviewStyles />
     </div>
   );
 };

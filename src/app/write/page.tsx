@@ -129,7 +129,7 @@ export default function WritePage() {
   return (
     <div className="flex h-screen">
       {/* 왼쪽 에디터 패널 */}
-      <div className="w-1/2 flex flex-col bg-surface2">
+      <div className="w-1/2 flex flex-col bg-surface1">
         <WriteHeader
           title={postData.title}
           tags={postData.tags}
@@ -143,7 +143,7 @@ export default function WritePage() {
           <MarkdownEditor onChangeContent={handleContentChange} />
         </div>
         {/* 하단 버튼 영역 */}
-        <div className="h-12 border-t border-bg2 bg-surface2 flex items-center px-4">
+        <div className="h-12 border-t border-bg2 bg-surface1 flex items-center px-4">
           <div className="flex-1">
             <button
               onClick={() => window.history.back()}
@@ -162,7 +162,7 @@ export default function WritePage() {
             <button
               onClick={handlePublish}
               disabled={isSubmitting}
-              className="px-4 py-1.5 bg-third text-white rounded-md hover:opacity-90 disabled:opacity-50 text-sm"
+              className="px-4 py-1.5 bg-success text-white rounded-md hover:opacity-90 disabled:opacity-50 text-sm"
             >
               {isSubmitting ? '저장 중...' : '출간하기'}
             </button>
@@ -171,7 +171,7 @@ export default function WritePage() {
       </div>
 
       {/* 오른쪽 프리뷰 패널 */}
-      <div className="w-1/2">
+      <div className="w-1/2 border-l border-[#E4E6EB]">
         <MarkdownPreview
           content={postData.content}
           isPreview={true}

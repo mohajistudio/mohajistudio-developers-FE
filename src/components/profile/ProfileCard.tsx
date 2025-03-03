@@ -7,7 +7,15 @@ import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/apis/users';
 import type { UserDetail } from '@/types/blog';
 
-export default function ProfileCard() {
+interface ProfileCardProps {
+  userId?: string;
+  onUserIdFetched?: (userId: string) => void;
+}
+
+export default function ProfileCard({
+  userId,
+  onUserIdFetched,
+}: ProfileCardProps) {
   const auth = useRecoilValue(authState);
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
 
@@ -21,6 +29,9 @@ export default function ProfileCard() {
           const data = await getUserDetail(auth.userInfo.nickname);
           console.log('Fetched user detail:', data);
           setUserDetail(data);
+          if (onUserIdFetched) {
+            onUserIdFetched(data.nickname);
+          }
         } catch (error) {
           console.error('Failed to fetch user detail:', error);
         }
@@ -28,7 +39,7 @@ export default function ProfileCard() {
     };
 
     fetchUserDetail();
-  }, [auth.isLoggedIn, auth.userInfo?.nickname]);
+  }, [auth.isLoggedIn, auth.userInfo?.nickname, onUserIdFetched]);
 
   if (!userDetail) return null;
 

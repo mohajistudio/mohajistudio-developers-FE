@@ -46,16 +46,21 @@ export interface EmailVerificationRequestResponse {
   expiredAt: string;
 }
 
-export interface CustomJwtPayload extends JwtPayload {
-  iat: number;
-  iss: string;
-  exp: number;
+export interface CustomJwtPayload {
+  sub: string;
+  email: string;
+  role: string;
+  nickname: string;
   user: {
-    sub: string;
+    id: string;
     email: string;
     role: string;
     nickname: string;
+    profileImageUrl: string | null;
   };
+  iat: number;
+  exp: number;
+  iss: string;
 }
 
 {

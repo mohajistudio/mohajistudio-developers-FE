@@ -39,7 +39,11 @@ const MOCK_CONTACTS = [
   },
 ];
 
-export default function Contact() {
+interface ContactProps {
+  userId?: string;
+}
+
+export default function Contact({ userId }: ContactProps) {
   const auth = useRecoilValue(authState);
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
 

@@ -31,8 +31,10 @@ export const initializeAuthState = (setAuth: any, accessToken: string) => {
   try {
     const decoded = jwtDecode<CustomJwtPayload>(accessToken);
 
+    // console.log('Full decoded token:', decoded);
+
     const userInfo = {
-      id: decoded.user.sub,
+      id: decoded.user.id,
       email: decoded.user.email,
       role: decoded.user.role,
       nickname: decoded.user.nickname,
@@ -40,6 +42,8 @@ export const initializeAuthState = (setAuth: any, accessToken: string) => {
         localStorage.getItem('profileImage') ||
         '/icon/Profile_Default_img@2x.svg',
     };
+
+    // console.log('Setting user info:', userInfo);
 
     setAuth({
       isLoggedIn: true,

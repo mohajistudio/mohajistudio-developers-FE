@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "./Button";
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {
-  title: "Design System/Button",
+  title: 'Design System/Button',
   component: Button,
   parameters: {
-    layout: "centered",
+    layout: 'centered',
     backgrounds: {
-      default: "light",
+      default: 'light',
       values: [
-        { name: "light", value: "#F2F3F5" },
-        { name: "surface", value: "#FFFFFF" },
+        { name: 'light', value: '#F2F3F5' },
+        { name: 'surface', value: '#FFFFFF' },
       ],
     },
   },
-  tags: ["autodocs"],
+  tags: ['autodocs'],
 };
 
 export default meta;
@@ -22,22 +22,22 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {
   args: {
-    variant: "primary",
-    children: "확인",
+    variant: 'primary',
+    children: '확인',
   },
 };
 
 export const Secondary: Story = {
   args: {
-    variant: "secondary",
-    children: "취소",
+    variant: 'secondary',
+    children: '취소',
   },
 };
 
 export const Third: Story = {
   args: {
-    variant: "third",
-    children: "강조",
+    variant: 'third',
+    children: '강조',
   },
 };
 

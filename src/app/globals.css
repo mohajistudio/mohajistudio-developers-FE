@@ -41,3 +41,171 @@
     @apply bg-[#F2F3F5]; /* 직접적인 HEX 값 사용 */
   }
 }
+
+/* 토스트 스타일 */
+.frameParent {
+  width: 100%;
+  position: relative;
+  border-radius: 3px 3px 0px 0px;
+  background-color: #fcfcfc;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 16px;
+  box-sizing: border-box;
+  text-align: left;
+  font-size: 14px;
+  color: #000;
+  font-family: Pretendard;
+}
+
+.successIcon {
+  width: 24px;
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.b {
+  flex: 1;
+  position: relative;
+  line-height: 24px;
+}
+
+.description {
+  flex: 1;
+  position: relative;
+  line-height: 20px;
+  color: #666666;
+  margin-top: 4px;
+  font-weight: normal;
+  white-space: pre-line; /* 줄바꿈 문자(\n)를 인식하도록 설정 */
+}
+
+.wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.successParent {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.toast-container {
+  display: flex;
+  width: 392px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+}
+
+.toast-content {
+  display: flex;
+  width: 100%;
+  padding: 16px;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.toast-icon-container {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.toast-icon-container.success {
+  background-color: #4caf50;
+}
+
+.toast-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.toast-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+}
+
+.toast-title {
+  color: #000000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  margin: 0;
+}
+
+.toast-description {
+  color: #666666;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0;
+  white-space: pre-line !important;
+}
+
+.toast-close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* React-Toastify 커스터마이징 */
+.Toastify__toast {
+  padding: 0 !important;
+  min-height: auto !important;
+  margin-bottom: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.Toastify__toast-body {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.Toastify__close-button {
+  display: none !important; /* 기본 닫기 버튼 숨김 */
+}
+
+.Toastify__toast-container {
+  width: auto !important;
+  padding: 0 !important;
+}
+
+.toast-icon-direct {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}

@@ -6,6 +6,9 @@ import { useSetRecoilState } from 'recoil';
 import { authState } from '@/store/auth';
 import { jwtDecode } from 'jwt-decode';
 import type { CustomJwtPayload } from '@/types/auth';
+import { ThemeProvider } from 'next-themes';
+import { ToastProvider } from '@/contexts/ToastContext';
+import { ReactNode } from 'react';
 
 function AuthInitializer() {
   const setAuth = useSetRecoilState(authState);
@@ -50,11 +53,13 @@ function AuthInitializer() {
   return null;
 }
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({ children }: { children: ReactNode }) {
   return (
     <RecoilRoot>
       <AuthInitializer />
-      {children}
+      <ThemeProvider attribute="class" enableSystem={false}>
+        <ToastProvider>{children}</ToastProvider>
+      </ThemeProvider>
     </RecoilRoot>
   );
 }

@@ -11,6 +11,7 @@ import type { ApiError } from '@/types/auth';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { authState, initializeAuthState } from '@/store/auth';
+import { useToast } from '@/contexts/ToastContext';
 
 export default function LoginPasswordPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function LoginPasswordPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [auth, setAuth] = useRecoilState(authState);
+  const { showToast } = useToast();
 
   useEffect(() => {
     const storedEmail = localStorage.getItem('tempEmail');
@@ -47,6 +49,12 @@ export default function LoginPasswordPage() {
       // 임시 데이터 삭제
       localStorage.removeItem('tempEmail');
 
+      // 로그인 성공 토스트 메시지 표시
+      showToast('success', {
+        title: '로그인 성공',
+        description: '모하지 스튜디오에 오신 것을 환영합니다!',
+      });
+
       // 홈으로 이동
       router.push('/');
     } catch (error) {
@@ -54,11 +62,32 @@ export default function LoginPasswordPage() {
 
       if (axios.isAxiosError(error)) {
         const apiError = error.response?.data as ApiError;
-        setError(getAuthErrorMessage(apiError));
+        const errorMessage = getAuthErrorMessage(apiError);
+        setError(errorMessage);
+
+        // 로그인 실패 토스트 메시지 표시
+        showToast('error', {
+          title: '로그인 실패',
+          description: errorMessage,
+        });
       } else if (error instanceof Error) {
         setError(error.message);
+
+        // 로그인 실패 토스트 메시지 표시
+        showToast('error', {
+          title: '로그인 실패',
+          description: error.message,
+        });
       } else {
-        setError('로그인에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        const defaultErrorMsg =
+          '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        setError(defaultErrorMsg);
+
+        // 로그인 실패 토스트 메시지 표시
+        showToast('error', {
+          title: '로그인 실패',
+          description: defaultErrorMsg,
+        });
       }
     } finally {
       setIsLoading(false);

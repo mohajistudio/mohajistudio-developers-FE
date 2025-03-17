@@ -17,8 +17,9 @@ export interface User {
   id: string;
   nickname: string;
   email: string;
-  profileImageUrl?: string;
+  profileImageUrl?: string | null;
   role: string;
+  job_role?: string | null;
 }
 
 // 태그 타입
@@ -93,7 +94,7 @@ export interface PaginatedResponse<T> {
 // 게시글 필터링/정렬 옵션
 export interface PostFilters {
   tag?: string;
-  username?: string;
+  nickname?: string;
   status?: PostStatus;
   sortBy?: 'latest' | 'popular'; // 최신순 | 인기순
 }
@@ -163,5 +164,6 @@ export interface UserDetail {
   profileImageUrl: string;
   bio: string;
   role: string;
+  jobRole?: string;
   contacts: Contact[];
 }

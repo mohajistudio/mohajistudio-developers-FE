@@ -19,19 +19,19 @@ export default function LoggedOutLayout({
   searchParams,
 }: LoggedOutLayoutProps) {
   return (
-    <div className="flex overflow-hidden flex-col items-center px-20 pt-9 pb-40 max-md:px-5 max-md:pt-9 max-md:pb-24 max-sm:p-5">
+    <div className="flex overflow-hidden flex-col items-center mt-10">
       <div className="flex flex-col max-w-full w-[1240px] max-sm:w-full">
-        <main className="flex flex-col self-end mt-16 max-w-full w-[1028px]">
+        <main className="flex flex-col self-end w-[1028px]">
           <div className="w-[720px]">
             <SearchBar />
           </div>
 
-          <div className="mt-14">
-            <div className="flex gap-5 max-md:flex-col">
+          <div className="mt-10">
+            <div className="flex gap-8 max-md:flex-col">
               <div className="w-[71%] max-md:w-full max-sm:w-full">
                 <section>
                   {/* 태그 섹션 */}
-                  <div className="mb-14">
+                  <div className="mb-10">
                     <div className="flex gap-2 items-center mb-3 text-base font-bold text-black">
                       <Image
                         src="/icon/Tag.svg"
@@ -64,7 +64,7 @@ export default function LoggedOutLayout({
               </div>
 
               {/* 오른쪽 사이드바 영역 */}
-              <aside className="w-[29%] max-md:w-full max-sm:w-full">
+              <aside className="w-[286px] shrink-0 max-md:w-full max-sm:w-full">
                 <div>
                   <div className="flex gap-2 items-center mb-3 text-base font-bold text-black">
                     <Image
@@ -79,8 +79,9 @@ export default function LoggedOutLayout({
                     {developers.map((developer) => (
                       <DeveloperCard
                         key={developer.id}
-                        username={developer.nickname}
-                        role="Developer"
+                        nickname={developer.nickname}
+                        role={developer.role}
+                        jobRole={developer.job_role}
                         profileImage={
                           developer.profileImageUrl ||
                           '/icon/Profile_Default_img@2x.svg'

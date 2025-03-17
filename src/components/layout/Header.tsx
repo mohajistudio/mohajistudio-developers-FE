@@ -30,7 +30,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-[#F2F3F5]">
       <div className="max-w-[1240px] mx-auto h-16 flex items-center justify-between">
-        {/* 왼쪽 영역 (PostCard와 동일한 width) */}
+        {/* 왼쪽 영역 */}
         <div className="w-[71%]">
           <Link href="/" className="text-2xl font-bold text-[#0A0A0A]">
             <Image
@@ -49,7 +49,7 @@ export default function Header() {
             {auth.isLoggedIn && (
               <Link
                 href="/write"
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
+                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
               >
                 <Image
                   src="/icon/Edit.svg"
@@ -63,17 +63,17 @@ export default function Header() {
             {auth.isLoggedIn ? (
               <div className="relative">
                 <button
-                  className="w-8 h-8 rounded-full overflow-hidden hover:bg-black hover:bg-opacity-40 transition-all"
+                  className="w-6 h-6 flex items-center justify-center rounded-full overflow-hidden hover:bg-black hover:bg-opacity-40 transition-all"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <ProfileImage src={auth.userInfo?.profileImage} size={32} />
+                  <ProfileImage src={auth.userInfo?.profileImage} size={24} />
                 </button>
                 {isDropdownOpen && <ProfileDropdown onLogout={handleLogout} />}
               </div>
             ) : (
               <Link
                 href="/login"
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
+                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black hover:bg-opacity-40 transition-all"
               >
                 <Image
                   src="/icon/Login.svg"

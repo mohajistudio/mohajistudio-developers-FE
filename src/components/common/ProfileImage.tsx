@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 interface ProfileImageProps {
+  nickname?: string;
   src?: string | null;
   alt?: string;
   size?: number;
@@ -8,9 +9,10 @@ interface ProfileImageProps {
 }
 
 export default function ProfileImage({
+  nickname = '사용자',
   src,
   alt = '프로필',
-  size = 32,
+  size = 24,
   className = '',
 }: ProfileImageProps) {
   return (

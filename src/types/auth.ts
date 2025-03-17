@@ -110,4 +110,6 @@ export const AUTH_ERROR_CODES = {
 export const USER_ERROR_CODES = {
   FETCH_FAILED: 'U0002',
   INVALID_ROLE: 'U0003',
+  UNKNOWN_USER: 'U0001',
+  UPDATE_FAILED: 'U0004',
 } as const;

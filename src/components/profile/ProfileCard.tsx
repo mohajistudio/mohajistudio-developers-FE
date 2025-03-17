@@ -3,31 +3,34 @@
 import Image from 'next/image';
 import { useRecoilValue } from 'recoil';
 import { authState } from '@/store/auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { getUserDetail } from '@/apis/users';
 import type { UserDetail } from '@/types/blog';
+import ProfileEdit from './ProfileEdit';
 
 interface ProfileCardProps {
   userId?: string;
   onUserIdFetched?: (userId: string) => void;
+  toggleEditMode?: (isEdit: boolean) => void;
 }
 
-export default function ProfileCard({
-  userId,
-  onUserIdFetched,
-}: ProfileCardProps) {
+const ProfileCard = forwardRef<
+  { toggleEditMode: (isEdit: boolean) => void },
+  ProfileCardProps
+>(({ userId, onUserIdFetched, toggleEditMode }, ref) => {
   const auth = useRecoilValue(authState);
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  console.log('Auth state in ProfileCard:', auth);
+  // console.log('Auth state in ProfileCard:', auth);
 
   useEffect(() => {
     const fetchUserDetail = async () => {
       if (auth.isLoggedIn && auth.userInfo?.nickname) {
         try {
-          console.log('Fetching user detail for:', auth.userInfo.nickname);
+          // console.log('Fetching user detail for:', auth.userInfo.nickname);
           const data = await getUserDetail(auth.userInfo.nickname);
-          console.log('Fetched user detail:', data);
+          // console.log('Fetched user detail:', data);
           setUserDetail(data);
           if (onUserIdFetched) {
             onUserIdFetched(data.nickname);
@@ -40,6 +43,27 @@ export default function ProfileCard({
 
     fetchUserDetail();
   }, [auth.isLoggedIn, auth.userInfo?.nickname, onUserIdFetched]);
+
+  useEffect(() => {
+    if (toggleEditMode) {
+      toggleEditMode(isEditMode);
+    }
+  }, [isEditMode, toggleEditMode]);
+
+  const handleToggleEditMode = (value: boolean) => {
+    setIsEditMode(value);
+  };
+
+  useImperativeHandle(ref, () => ({
+    toggleEditMode: handleToggleEditMode,
+  }));
+
+  useEffect(() => {
+    // console.log('ProfileCard isEditMode 변경:', isEditMode);
+    if (isEditMode && userDetail) {
+      // console.log('편집 모드 활성화, userDetail:', userDetail);
+    }
+  }, [isEditMode, userDetail]);
 
   if (!userDetail) return null;
 
@@ -68,7 +92,7 @@ export default function ProfileCard({
           </div>
           <div className="self-stretch px-0.5 flex justify-start items-start gap-2.5">
             <div className="grow shrink basis-0 text-[#999999] text-sm font-medium leading-none">
-              {userDetail.role}
+              {userDetail.jobRole || userDetail.role || ''}
             </div>
           </div>
         </div>
@@ -80,4 +104,8 @@ export default function ProfileCard({
       </div>
     </div>
   );
-}
+});
+
+ProfileCard.displayName = 'ProfileCard';
+
+export default ProfileCard;

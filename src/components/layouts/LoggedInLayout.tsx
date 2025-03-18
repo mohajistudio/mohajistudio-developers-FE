@@ -3,15 +3,18 @@ import PostListClient from '@/components/blog/PostListClient';
 import Image from 'next/image';
 import TagListContainer from '@/components/common/TagListContainer';
 import ProfileCard from '@/components/profile/ProfileCard';
+import ProfileEdit from '@/components/profile/ProfileEdit';
 import Contact from '@/components/profile/Contact';
 import type { PaginatedResponse, Post, User, Tag } from '@/types/blog';
 import { useRecoilValue } from 'recoil';
 import { authState } from '@/store/auth';
 import VerticalTagList from '@/components/common/VerticalTagList';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import DeleteAccount from '../profile/DeleteAccount';
+import { getUserDetail } from '@/apis/users';
+import { UserDetail } from '@/types/blog';
 
 interface LoggedInLayoutProps {
   initialData: PaginatedResponse<Post>;
@@ -31,6 +34,9 @@ export default function LoggedInLayout({
   const pathname = usePathname();
   const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
   const [fetchedUserId, setFetchedUserId] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false); // 편집 모드 상태
+  const profileCardRef = useRef(null);
+  const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
 
   useEffect(() => {
     // 1. props로 전달받은 profileUserId가 있으면 사용
@@ -71,27 +77,56 @@ export default function LoggedInLayout({
   const isCurrentUserProfile =
     auth.isLoggedIn && auth.userInfo?.id === currentProfileId;
 
-  // 디버깅 로그 추가
-  console.log('Auth User ID:', auth.userInfo?.id);
-  console.log('Current Profile ID:', currentProfileId);
-  console.log('Is Current User Profile:', isCurrentUserProfile);
+  // 프로필 편집 모드 전환
+  const handleEditProfile = () => {
+    // console.log('handleEditProfile 호출');
+    // 직접 편집 모드 설정
+    setIsEditMode(true);
+  };
+
+  // 프로필 편집 취소
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+  };
+
+  // 사용자 데이터 가져오기
+  useEffect(() => {
+    const fetchUserDetail = async () => {
+      if (auth.isLoggedIn && auth.userInfo?.nickname) {
+        try {
+          const data = await getUserDetail(auth.userInfo.nickname);
+          setUserDetail(data);
+        } catch (error) {
+          console.error('Failed to fetch user detail:', error);
+        }
+      }
+    };
+
+    fetchUserDetail();
+  }, [auth.isLoggedIn, auth.userInfo?.nickname]);
+
+  // 프로필 업데이트 핸들러
+  const handleProfileUpdate = (updatedData: UserDetail) => {
+    // console.log('프로필 업데이트됨:', updatedData);
+    setUserDetail(updatedData);
+  };
 
   return (
     <div className="flex overflow-hidden flex-col items-center px-20 pt-9 pb-40 max-md:px-5 max-md:pt-9 max-md:pb-24 max-sm:p-5">
       <div className="flex flex-col max-w-full w-[1240px] max-sm:w-full">
         {/* SearchBar 영역 */}
-        <div className="flex gap-5">
-          <div className="w-[240px] shrink-0" />
+        <div className="flex gap-8">
+          <div className="w-[180px] shrink-0" />
           <div className="w-[720px]">
             <SearchBar />
           </div>
-          <div className="w-[240px] shrink-0" />
+          <div className="w-[286px] shrink-0" />
         </div>
 
         {/* 메인 컨텐츠 영역 */}
-        <div className="mt-14 flex gap-5">
+        <div className="mt-8 flex gap-8">
           {/* 좌측 Tags 섹션 */}
-          <aside className="w-[240px] shrink-0">
+          <aside className="w-[180px] shrink-0">
             <div className="sticky top-[100px]">
               <h2 className="flex gap-2 items-center h-[42px] text-base font-bold text-black mb-3">
                 <Image src="/icon/Tag.svg" alt="태그" width={24} height={24} />
@@ -116,7 +151,7 @@ export default function LoggedInLayout({
           </div>
 
           {/* Profile 섹션 */}
-          <aside className="w-[240px] shrink-0">
+          <aside className="w-[286px] shrink-0">
             <div className="sticky top-[100px]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="flex gap-2 items-center h-[42px] text-base font-bold text-black">
@@ -129,23 +164,40 @@ export default function LoggedInLayout({
                   <span>Profile</span>
                 </h2>
                 {isCurrentUserProfile && (
-                  <Link href="/profile/edit">
+                  <button
+                    onClick={isEditMode ? handleCancelEdit : handleEditProfile}
+                    className="p-1 hover:bg-gray-100 rounded-full"
+                  >
                     <Image
-                      src="/icon/Post_edit.svg"
-                      alt="프로필 수정"
+                      src={
+                        isEditMode
+                          ? '/icon/toast/Close.svg'
+                          : '/icon/Post_edit.svg'
+                      }
+                      alt={isEditMode ? '닫기' : '프로필 수정'}
                       width={24}
                       height={24}
                       className="cursor-pointer"
                     />
-                  </Link>
+                  </button>
                 )}
               </div>
 
               <div className="space-y-5">
-                <ProfileCard
-                  userId={currentProfileId || undefined}
-                  onUserIdFetched={handleUserIdFetched}
-                />
+                {isEditMode && isCurrentUserProfile ? (
+                  <ProfileEdit
+                    userId={userDetail?.id || ''}
+                    onCancel={handleCancelEdit}
+                    initialUserData={userDetail || undefined}
+                    onProfileUpdate={handleProfileUpdate}
+                  />
+                ) : (
+                  <ProfileCard
+                    userId={currentProfileId || undefined}
+                    onUserIdFetched={handleUserIdFetched}
+                    ref={profileCardRef}
+                  />
+                )}
 
                 <div>
                   <div className="flex justify-between items-center mb-3">
@@ -158,7 +210,7 @@ export default function LoggedInLayout({
                       />
                       <span>Contact</span>
                     </h2>
-                    {isCurrentUserProfile && (
+                    {isCurrentUserProfile && !isEditMode && (
                       <button>
                         <Image
                           src="/icon/Add_small.svg"
@@ -173,7 +225,7 @@ export default function LoggedInLayout({
                   <Contact userId={currentProfileId || undefined} />
                 </div>
 
-                {isCurrentUserProfile && (
+                {isCurrentUserProfile && !isEditMode && (
                   <div>
                     <div className="flex justify-between items-center mb-3">
                       <h2 className="flex gap-2 items-center h-[42px] text-base font-bold text-black">

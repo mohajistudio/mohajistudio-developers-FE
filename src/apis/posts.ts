@@ -110,15 +110,16 @@ export const createPost = async (postData: CreatePostRequest) => {
         ...requestData,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        userId: '', // 실제 userId는 서버에서 설정됨
+        userId: '',
         viewCount: 0,
-        tags: [], // 태그 정보는 목록 조회 시 가져올 수 있음
+        tags: [],
         user: {
-          // 사용자 정보도 목록 조회 시 가져올 수 있음
           id: '',
-          username: '',
+          nickname: '',
+          email: '',
+          role: '',
         },
-      } as Post;
+      } as unknown as Post;
     }
 
     throw new Error('게시글 생성 실패: 잘못된 서버 응답 형식');

@@ -5,39 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { authState } from '@/store/auth';
 import { useEffect, useState } from 'react';
 import { getUserDetail } from '@/apis/users';
-import type { UserDetail } from '@/types/blog';
-
-// 임시 데이터
-const MOCK_CONTACTS = [
-  {
-    id: '1',
-    name: 'github',
-    imageUrl: '/icon/github.svg',
-    displayName: 'GitHub',
-    url: 'https://github.com/leech',
-  },
-  {
-    id: '2',
-    name: 'email',
-    imageUrl: '/icon/email.svg',
-    displayName: 'Email',
-    url: 'mailto:cksgh5477@gmail.com',
-  },
-  {
-    id: '3',
-    name: 'tistory',
-    imageUrl: '/icon/tistory.svg',
-    displayName: 'Tistory',
-    url: 'https://leech.tistory.com',
-  },
-  {
-    id: '4',
-    name: 'blog',
-    imageUrl: '/icon/blog.svg',
-    displayName: 'Blog',
-    url: 'https://blog.mohaji.dev',
-  },
-];
+import type { UserDetail, Contact as ContactType } from '@/types/blog';
 
 interface ContactProps {
   userId?: string;
@@ -46,37 +14,48 @@ interface ContactProps {
 export default function Contact({ userId }: ContactProps) {
   const auth = useRecoilValue(authState);
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserDetail = async () => {
-      if (auth.isLoggedIn && auth.userInfo?.nickname) {
+      if (userId || (auth.isLoggedIn && auth.userInfo?.nickname)) {
+        setIsLoading(true);
         try {
-          const data = await getUserDetail(auth.userInfo.nickname);
-          // 임시로 목데이터 사용
-          setUserDetail({
-            ...data,
-            contacts: MOCK_CONTACTS,
-          });
+          // userId가 있으면 해당 사용자의 정보를, 없으면 로그인한 사용자의 정보를 가져옴
+          const targetNickname = userId ? userId : auth.userInfo?.nickname;
+
+          const data = await getUserDetail(targetNickname as string);
+          setUserDetail(data);
         } catch (error) {
           console.error('Failed to fetch user detail:', error);
-          // API 호출 실패시에도 목데이터 표시
-          setUserDetail({
-            ...userDetail,
-            contacts: MOCK_CONTACTS,
-          } as UserDetail);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
 
     fetchUserDetail();
-  }, [auth.isLoggedIn, auth.userInfo?.nickname]);
+  }, [userId, auth.isLoggedIn, auth.userInfo?.nickname]);
 
-  // 목데이터 사용을 위해 조건 변경
-  if (!auth.isLoggedIn) return null;
+  if (isLoading) {
+    return (
+      <div className="h-60 p-3 bg-[#fcfcfc] rounded-2xl shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] flex items-center justify-center">
+        <p className="text-[#666666]">로딩 중...</p>
+      </div>
+    );
+  }
+
+  if (!userDetail?.contacts || userDetail.contacts.length === 0) {
+    return (
+      <div className="h-60 p-3 bg-[#fcfcfc] rounded-2xl shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] flex items-center justify-center">
+        <p className="text-[#666666]">등록된 연락처가 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-60 p-3 bg-[#fcfcfc] rounded-2xl shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] flex flex-col justify-start items-start gap-2">
-      {MOCK_CONTACTS.map((contact) => (
+    <div className="h-auto min-h-60 p-3 bg-[#fcfcfc] rounded-2xl shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] flex flex-col justify-start items-start gap-2">
+      {userDetail.contacts.map((contact) => (
         <a
           key={contact.id}
           href={contact.url}
@@ -93,7 +72,7 @@ export default function Contact({ userId }: ContactProps) {
           />
           <div className="grow shrink basis-0 h-[22px] flex justify-center items-center gap-2.5">
             <div className="grow shrink basis-0 text-[#4c4c4c] text-sm font-medium leading-snug">
-              {contact.name}
+              {contact.displayName || contact.name}
             </div>
           </div>
         </a>

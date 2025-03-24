@@ -5,7 +5,13 @@ import TagListContainer from '@/components/common/TagListContainer';
 import ProfileCard from '@/components/profile/ProfileCard';
 import ProfileEdit from '@/components/profile/ProfileEdit';
 import Contact from '@/components/profile/Contact';
-import type { PaginatedResponse, Post, User, Tag } from '@/types/blog';
+import type {
+  PaginatedResponse,
+  Post,
+  User,
+  Tag,
+  Contact as ContactType,
+} from '@/types/blog';
 import { useRecoilValue } from 'recoil';
 import { authState } from '@/store/auth';
 import VerticalTagList from '@/components/common/VerticalTagList';
@@ -15,6 +21,8 @@ import { usePathname } from 'next/navigation';
 import DeleteAccount from '../profile/DeleteAccount';
 import { getUserDetail } from '@/apis/users';
 import { UserDetail } from '@/types/blog';
+import ContactEditModal from '../profile/ContactEditModal';
+import { updateUserContacts } from '@/apis/contact-types';
 
 interface LoggedInLayoutProps {
   initialData: PaginatedResponse<Post>;
@@ -35,24 +43,24 @@ export default function LoggedInLayout({
   const [currentProfileId, setCurrentProfileId] = useState<string | null>(null);
   const [fetchedUserId, setFetchedUserId] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false); // 편집 모드 상태
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false); // 연락처 편집 모달 상태
   const profileCardRef = useRef(null);
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
 
   useEffect(() => {
-    // 1. props로 전달받은 profileUserId가 있으면 사용
     if (profileUserId) {
       setCurrentProfileId(profileUserId);
       return;
     }
 
-    // 2. URL에서 프로필 ID 추출 시도
+    // URL에서 프로필 ID 추출 시도
     const profilePathMatch = pathname.match(/\/profile\/([^\/]+)/);
     if (profilePathMatch && profilePathMatch[1]) {
       setCurrentProfileId(profilePathMatch[1]);
       return;
     }
 
-    // 3. 홈페이지('/')인 경우 또는 다른 페이지에서는 로그인한 사용자의 ID 사용
+    // 홈페이지('/')인 경우 또는 다른 페이지에서는 로그인한 사용자의 ID 사용
     if (auth.userInfo?.id) {
       setCurrentProfileId(auth.userInfo.id);
     } else {
@@ -62,18 +70,15 @@ export default function LoggedInLayout({
 
   // ProfileCard에서 가져온 사용자 ID를 사용
   useEffect(() => {
-    // 로그에서 확인한 사용자 ID를 직접 사용
     if (auth.isLoggedIn && auth.userInfo) {
       setCurrentProfileId(auth.userInfo.id);
     }
   }, [auth.isLoggedIn, auth.userInfo]);
 
-  // ProfileCard 컴포넌트에서 사용자 ID를 받아오는 콜백 함수
   const handleUserIdFetched = (userId: string) => {
     setFetchedUserId(userId);
   };
 
-  // 현재 보고 있는 프로필이 로그인한 사용자의 것인지 확인
   const isCurrentUserProfile =
     auth.isLoggedIn && auth.userInfo?.id === currentProfileId;
 
@@ -84,12 +89,10 @@ export default function LoggedInLayout({
     setIsEditMode(true);
   };
 
-  // 프로필 편집 취소
   const handleCancelEdit = () => {
     setIsEditMode(false);
   };
 
-  // 사용자 데이터 가져오기
   useEffect(() => {
     const fetchUserDetail = async () => {
       if (auth.isLoggedIn && auth.userInfo?.nickname) {
@@ -105,10 +108,35 @@ export default function LoggedInLayout({
     fetchUserDetail();
   }, [auth.isLoggedIn, auth.userInfo?.nickname]);
 
-  // 프로필 업데이트 핸들러
   const handleProfileUpdate = (updatedData: UserDetail) => {
     // console.log('프로필 업데이트됨:', updatedData);
     setUserDetail(updatedData);
+  };
+
+  const handleOpenContactModal = () => {
+    setIsContactModalOpen(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setIsContactModalOpen(false);
+  };
+
+  const handleSaveContacts = async (updatedContacts: ContactType[]) => {
+    if (!currentProfileId) return;
+
+    try {
+      const response = await updateUserContacts(
+        currentProfileId,
+        updatedContacts,
+      );
+
+      if (auth.isLoggedIn && auth.userInfo?.nickname) {
+        const updatedUserDetail = await getUserDetail(auth.userInfo.nickname);
+        setUserDetail(updatedUserDetail);
+      }
+    } catch (error) {
+      console.error('연락처 업데이트 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -201,7 +229,14 @@ export default function LoggedInLayout({
 
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <h2 className="flex gap-2 items-center h-[42px] text-base font-bold text-black">
+                    <h2
+                      className="flex gap-2 items-center h-[42px] text-base font-bold text-black cursor-pointer"
+                      onClick={
+                        isCurrentUserProfile
+                          ? handleOpenContactModal
+                          : undefined
+                      }
+                    >
                       <Image
                         src="/icon/Contact.svg"
                         alt="연락처"
@@ -211,7 +246,7 @@ export default function LoggedInLayout({
                       <span>Contact</span>
                     </h2>
                     {isCurrentUserProfile && !isEditMode && (
-                      <button>
+                      <button onClick={handleOpenContactModal}>
                         <Image
                           src="/icon/Add_small.svg"
                           alt="연락처 추가"
@@ -246,6 +281,16 @@ export default function LoggedInLayout({
           </aside>
         </div>
       </div>
+
+      {/* 연락처 편집 모달 */}
+      {isCurrentUserProfile && (
+        <ContactEditModal
+          isOpen={isContactModalOpen}
+          onClose={handleCloseContactModal}
+          onSave={handleSaveContacts}
+          initialContacts={userDetail?.contacts || []}
+        />
+      )}
     </div>
   );
 }

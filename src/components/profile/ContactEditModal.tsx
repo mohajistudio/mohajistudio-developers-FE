@@ -246,26 +246,24 @@ export default function ContactEditModal({
             {customContacts.map((contact, index) => (
               <div key={contact.id} className="relative">
                 <div className="flex items-center mb-4">
-                  <div className="w-6 mr-4">
-                    {isDeleteMode && (
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => handleCheckboxChange(contact.id)}
-                      >
-                        <Image
-                          src={
-                            contact.checked
-                              ? '/icon/CheckBox_Check.svg'
-                              : '/icon/CheckBox.svg'
-                          }
-                          alt="체크박스"
-                          width={24}
-                          height={24}
-                          className="w-6 h-6"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {isDeleteMode && (
+                    <div
+                      className="cursor-pointer w-6 mr-4"
+                      onClick={() => handleCheckboxChange(contact.id)}
+                    >
+                      <Image
+                        src={
+                          contact.checked
+                            ? '/icon/CheckBox_Check.svg'
+                            : '/icon/CheckBox.svg'
+                        }
+                        alt="체크박스"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
+                    </div>
+                  )}
                   <div
                     className="cursor-pointer relative"
                     onClick={() => handleShowIconSelector(contact.id)}
@@ -324,7 +322,7 @@ export default function ContactEditModal({
                   />
                 </div>
                 <div className="flex items-center">
-                  <div className="w-5 opacity-0 mr-4"></div>
+                  {isDeleteMode && <div className="w-5 opacity-0 mr-4"></div>}
                   <div className="w-8 mr-4 flex justify-start">
                     <span className="text-[#666666]">URL</span>
                   </div>
@@ -340,7 +338,7 @@ export default function ContactEditModal({
                 </div>
                 {errorMessage && index === customContacts.length - 1 && (
                   <div className="flex items-center mt-1">
-                    <div className="w-5 opacity-0 mr-4"></div>
+                    {isDeleteMode && <div className="w-5 opacity-0 mr-4"></div>}
                     <div className="w-8 mr-4"></div>
                     <p className="text-[#F44336] text-[14px]">{errorMessage}</p>
                   </div>
@@ -354,18 +352,24 @@ export default function ContactEditModal({
                 className="flex items-center mb-4 cursor-pointer"
                 onClick={handleAddCustomContact}
               >
-                <div className="w-6 mr-4"></div>
-                <div className="w-8 h-8 bg-[#F2F3F5] rounded-full mr-4"></div>
+                {isDeleteMode && <div className="w-6 mr-4"></div>}
+                <Image
+                  src="/icon/Input_img.svg"
+                  alt="추가 아이콘"
+                  width={32}
+                  height={32}
+                  className="w-8 h-8 mr-4"
+                />
                 <div className="flex-1 p-2 text-[#999999]">Display name</div>
               </div>
               <div className="flex items-center">
-                <div className="w-5 opacity-0 mr-4"></div>
-                <div className="w-8 mr-4 flex justify-start">
+                {isDeleteMode && <div className="w-5 opacity-0 mr-4"></div>}
+                {/* <div className="w-8 mr-4 flex justify-start">
                   <span className="text-[#999999]">URL</span>
                 </div>
                 <div className="flex-1 p-2 bg-[#F7F8FA] text-[#999999] rounded-md">
                   https://example.com/
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

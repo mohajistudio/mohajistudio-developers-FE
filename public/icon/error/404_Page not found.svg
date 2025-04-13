@@ -1,0 +1,38 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_2522_14383)">
+<g filter="url(#filter0_f_2522_14383)">
+<ellipse cx="80" cy="144" rx="60" ry="8" fill="#EBECF0"/>
+</g>
+<path d="M34 144H86C89.3137 144 92 141.314 92 138V85.1577C92 82.9969 91.1259 80.928 89.5766 79.4217L76.043 66.264C74.5497 64.8122 72.5491 64 70.4664 64H34C30.6863 64 28 66.6863 28 70V138C28 141.314 30.6863 144 34 144Z" fill="#F2F3F5"/>
+<path d="M42 136H94C97.3137 136 100 133.314 100 130V77.1577C100 74.9969 99.1259 72.928 97.5766 71.4217L84.043 58.264C82.5497 56.8122 80.5491 56 78.4664 56H42C38.6863 56 36 58.6863 36 62V130C36 133.314 38.6863 136 42 136Z" fill="white"/>
+<mask id="mask0_2522_14383" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="36" y="56" width="64" height="80">
+<path d="M42 136H94C97.3137 136 100 133.314 100 130V77.1577C100 74.9969 99.1259 72.928 97.5766 71.4217L84.043 58.264C82.5497 56.8122 80.5491 56 78.4664 56H42C38.6863 56 36 58.6863 36 62V130C36 133.314 38.6863 136 42 136Z" fill="#0A0A0A"/>
+</mask>
+<g mask="url(#mask0_2522_14383)">
+<path d="M80 54L104 78H84C81.7909 78 80 76.2091 80 74V54Z" fill="#F2F3F5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M52 91.5C52 90.6716 52.6716 90 53.5 90H78.5C79.3284 90 80 90.6716 80 91.5C80 92.3284 79.3284 93 78.5 93H53.5C52.6716 93 52 92.3284 52 91.5Z" fill="#E4E6EB"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M52 100.5C52 99.6716 52.6716 99 53.5 99H78.5C79.3284 99 80 99.6716 80 100.5C80 101.328 79.3284 102 78.5 102H53.5C52.6716 102 52 101.328 52 100.5Z" fill="#E4E6EB"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M52 109.5C52 108.672 52.6716 108 53.5 108H78.5C79.3284 108 80 108.672 80 109.5C80 110.328 79.3284 111 78.5 111H53.5C52.6716 111 52 110.328 52 109.5Z" fill="#E4E6EB"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M52 118.5C52 117.672 52.6716 117 53.5 117H70.5C71.3284 117 72 117.672 72 118.5C72 119.328 71.3284 120 70.5 120H53.5C52.6716 120 52 119.328 52 118.5Z" fill="#E4E6EB"/>
+</g>
+<path d="M116.739 91L127.739 110.053" stroke="#D2D5DB" stroke-width="4"/>
+<path d="M123.239 102.217L135.239 123.001" stroke="#D2D5DB" stroke-width="6" stroke-linecap="round"/>
+<circle cx="110.919" cy="72" r="21" fill="url(#paint0_linear_2522_14383)" stroke="#D2D5DB" stroke-width="4"/>
+<rect x="103.918" y="70" width="3" height="6" rx="1.5" fill="#D2D5DB"/>
+<rect x="114.918" y="70" width="3" height="6" rx="1.5" fill="#D2D5DB"/>
+</g>
+<defs>
+<filter id="filter0_f_2522_14383" x="16" y="132" width="128" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_2522_14383"/>
+</filter>
+<linearGradient id="paint0_linear_2522_14383" x1="110.919" y1="49" x2="110.919" y2="95" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="0.765" stop-color="#F7F8FA"/>
+</linearGradient>
+<clipPath id="clip0_2522_14383">
+<rect width="160" height="160" rx="8" fill="white"/>
+</clipPath>
+</defs>
+</svg>
